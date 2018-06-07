@@ -1,0 +1,75 @@
+Funktionen von Avorioni
+In eine eigene Datei zum Einbinden schreiben.
+Funktionen nicht Async aufrufen
+Funktionsumfang locken solange eine Opperation noch nicht abgeschlossen
+
+
+Grundlegendes
+	Server Starten
+	Server Stopen
+	Server Status
+	Manueller Save ausführen
+	
+Mediumlevel
+	Server Backup erstellen
+	Server Reset
+	
+Highlevel
+	Server Updaten
+	
+
+Funktionsablauf
+	Status
+		Lockfile prüfen
+		Wenn da:
+			Rcon Status abfrage starten
+			Rückgabe der Werte
+		Wenn nicht:
+			Info bit Abfrage
+			Wenn bestätigt:
+				Rcon testen
+			Wenn nicht:
+				nop:
+	Starten
+		Status prüfen
+		Wenn aus:
+			Server starten
+			Lockfile mit pid erstellen
+		Wenn an:
+			Info
+		
+	Stopen
+		Status prüfen
+		Wenn aus:
+			Info
+		Wenn an:
+			Server über Rcon beenden
+			Lockfile löschen
+	
+	Manueller Save
+		Statusprüfen
+		J:
+			Rcon Save
+		N:
+			nop
+			
+	Server backup
+		Server Save
+		Server Stop
+		Verzeichnis taren
+		Verzeichnis zipen
+		
+		Abfrage start
+		J:
+			Server starten
+		N:
+			nop
+			
+	Server Reset
+			Server Stop
+			Server Start
+		
+	Sever Update
+		Server Backup
+		Server Update
+		Server start
