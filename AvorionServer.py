@@ -50,15 +50,28 @@ def stop():
     
     """returns
 	string
+	false
 	"""
 	
     strReturn = runRcon("/stop")
+    
+    #Delete the Lockfile
+    try:
+		os.remove(settings.LockFile)
+	catch OSError:
+		return False
 
     return strReturn
 
 def start():
     #do some starting stuff
-
+    
+    #Create a Lockfile
+    try:
+		os.open(settings.LockFile,'w')
+	catch OSError:
+		return False 
+		
     return False
 
 def save():
