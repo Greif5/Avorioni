@@ -121,6 +121,26 @@ async def servRestart(ctx):
         await log(strText)
         await ctx.send(strText)
 
+@bot.command()
+async def servSave(ctx):
+	strText = "Erstelle Speicherpunkt"
+	await log(strText)
+	await ctx.send(strText)
+	
+	try:
+		if !AvorionServer.stop():
+			strText = "Gesichert"
+		else
+			strText = "Server läuft nicht"
+		
+		await log(strText)
+        await ctx.send(strText)
+    except UnicodeDecodeError:
+		strText = "Es ging etwas schief"
+        await log(strText)
+        await ctx.send(strText)	
+
+
 async def log(strLoggingText):
     strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
     print(strLoggingText)

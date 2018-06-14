@@ -101,9 +101,13 @@ def save():
 	"""
 	
 	"""returns
-	string
+	0	-	All Ok
+	-1	-	Server not running
 	"""
 	
+	if !os.path.isfile(settings.LockFile):
+		return -1
+    
     strReturn = runRcon("/save")
 
-    return strReturn
+    return 0
