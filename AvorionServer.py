@@ -23,6 +23,8 @@ def backup():
 	with tarfile.open(strBak, "w:gz") as tar:
 		tar.add(settings.ServerPath, arcname=os.path.basename(settings.ServerPath))
 	
+	
+	start()
 	return true
 
 def runRcon(strCommand):
