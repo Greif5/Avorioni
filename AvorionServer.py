@@ -3,18 +3,23 @@ import settings
 import valve.rcon
 import os.path
 
-def backup():
+def backup(intParam = 1):
 	"""throws
+	"""
+	
+	"""Params
+	Restart Server Y/n
 	"""
 		
 	"""returns
 	0	-	All ok
+	1	-	Backupcreated and Server stoped
 	-2	-	Server could not be stopped
 	-3	-	Server could not be started
 	"""
 	
 	#Stop the Server
-	if stop():
+	if !stop():
 		#Create time and backupname
 		#Time cheatsheet: http://strftime.org/
 		dtNow	= datetime.datetime.now()
@@ -25,11 +30,13 @@ def backup():
 		with tarfile.open(strBak, "w:gz") as tar:
 			tar.add(settings.ServerPath, arcname=os.path.basename(settings.ServerPath))
 		
-		
-		if start():
-			return 0
+		if intParam:
+			if start():
+				return 0
+			else
+				return -3
 		else
-			return -3
+			return 1
 	else
 		return -2
 
@@ -111,3 +118,17 @@ def save():
     strReturn = runRcon("/save")
 
     return 0
+
+def update():
+	"""returns
+	0	-	All Ok
+	-1	-	Lockfile could not be removed / Server could not be stopped
+	"""
+	
+	intErrorCode = backup(0)
+	if intErrorCode == -1:
+		return -1
+		
+	#Run Steam CMD with Params
+	
+	return 0:
