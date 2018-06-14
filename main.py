@@ -82,8 +82,16 @@ async def servBackup(ctx):
 	await ctx.send(strText)
 	
 	try:
-        AvorionServer.backup()
-        strText = "Backup erstellt"
+        intErrorCode = AvorionServer.backup()
+        if !intErrorCode:
+			strText = "Backup erstellt"
+		elif intErrorCode == -1 
+			strText = "Backup konnte nicht erstellt werden"
+		elif intErrorCode == -2
+			strText = "Server konnte nicht gestoppt werden"
+		elif intErrorCode == -3
+			strText = "Server konnte nicht gestartet werden"
+        
         await log(strText)
         await ctx.send(strText)
     except UnicodeDecodeError:
@@ -99,9 +107,13 @@ async def servRestart(ctx):
 	await ctx.send(strText)
 	
 	try:
-        AvorionServer.stop()
-        AvorionServer.start()
-        strText = "Server gestartet"
+        if !AvorionServer.stop():
+			if !AvorionServer.start():
+				strText = "Server gestartet"
+			else
+				strText = "Server konnte nicht gestartet werden"
+		else
+			strText = "Server konnte nicht gestoppt werden"
         await log(strText)
         await ctx.send(strText)
     except UnicodeDecodeError:
