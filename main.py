@@ -91,7 +91,23 @@ async def servBackup(ctx):
         await log(strText)
         await ctx.send(strText)
 
-
+@bot.command()
+@is_admin()
+async def servRestart(ctx):
+	strText = "Starte den Server neu"
+	await log(strText)
+	await ctx.send(strText)
+	
+	try:
+        AvorionServer.stop()
+        AvorionServer.start()
+        strText = "Server gestartet"
+        await log(strText)
+        await ctx.send(strText)
+    except UnicodeDecodeError:
+		strText = "Es ging etwas schief"
+        await log(strText)
+        await ctx.send(strText)
 
 async def log(strLoggingText):
     strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
