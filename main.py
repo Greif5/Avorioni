@@ -73,6 +73,23 @@ async def servStop(ctx):
         await log(strText)
         await ctx.send(strText)
     except UnicodeDecodeError:
+		
+@bot.command()
+@is_admin()
+async def servBackup(ctx):
+	strText = "Erstelle Backup"
+	await log(strText)
+	await ctx.send(strText)
+	
+	try:
+        AvorionServer.backup()
+        strText = "Backup erstellt"
+        await log(strText)
+        await ctx.send(strText)
+    except UnicodeDecodeError:
+		strText = "Es ging etwas schief"
+        await log(strText)
+        await ctx.send(strText)
 
 
 
