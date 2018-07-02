@@ -1,134 +1,143 @@
-import datetime
-import settings
-import valve.rcon
-import os.path
+import  datetime
+import  settings
+import  subprocess
+import  tarfile
+import	time
+import  valve.rcon
+import  os.path
+import	psutil
+from exceptionClasses import *
+
 
 def backup(intParam = 1):
 	"""throws
+	Server_notStarting
+	Server_notStopping
 	"""
 	
 	"""Params
 	Restart Server Y/n
 	"""
-		
-	"""returns
-	0	-	All ok
-	1	-	Backupcreated and Server stoped
-	-2	-	Server could not be stopped
-	-3	-	Server could not be started
-	"""
-	
-	#Stop the Server
-	if !stop():
-		#Create time and backupname
-		#Time cheatsheet: http://strftime.org/
-		dtNow	= datetime.datetime.now()
-		strNow	= dtNow.strftime('%Y-%m-%d_%H-%M-%S')
-		strBak	= settings.BackupPath + settings.BackupName +"_"+ strNow +".tgz"
-		
-		#Run backup
+
+	try:
+		# Stop the Server
+		stop()
+		# Create time and backupname
+		# Time cheatsheet: http://strftime.org/
+		dtNow = datetime.datetime.now()
+		strNow = dtNow.strftime('%Y-%m-%d_%H-%M-%S')
+		strBak = settings.BackupPath + settings.BackupName + "_" + strNow + ".tgz"
+
+		# Run backup
 		with tarfile.open(strBak, "w:gz") as tar:
 			tar.add(settings.ServerPath, arcname=os.path.basename(settings.ServerPath))
-		
+
 		if intParam:
-			if start():
-				return 0
-			else
-				return -3
-		else
-			return 1
-	else
-		return -2
+			try:
+				start()
+			except Server_isRunning:
+				pass
+			except Server_notStarting as e:
+				raise Server_notStarting(e)
+
+	except Server_notStopping as e:
+		raise Server_notStopping(e)
 
 def runRcon(strCommand):
-    """throws
-    UnicodeDecodeError
-    RCONAuthenticationError
-    RCONCommunicationError
-    RCONMessageError
+	"""throws
+	RCON_error
     """
     
-    """returns
+	"""returns
 	string
 	"""
-    strReturn = valve.rcon.execute(settings.address+":"+settings.port, settings.pw, strCommand)
+	try:
+		strReturn = valve.rcon.execute(settings.address+":"+settings.port, settings.pw, strCommand)
+	except Exception as e:
+		raise RCON_error(e)
 
-    return strReturn
+	return strReturn
 
 def stop():
-    """throws
-    UnicodeDecodeError
-    RCONAuthenticationError
-    RCONCommunicationError
-    RCONMessageError
+	"""throws
+    Sever_notStopping
     """
-    
-    """returns
-	0	-	all OK
-	-1	-	Lockfile could not be removed
-	"""
-	
-	if os.path.isfile(settings.LockFile):
-		strReturn = runRcon("/stop")
-    
-		#Delete the Lockfile
+
+	proc = getServer()
+	if proc:
 		try:
-			os.remove(settings.LockFile)
-		catch OSError:
-			return -1
-		return 0
-	else
-		return 0
+			save()
+		except Server_notRunning():
+			return
+		try:
+			strReturn = runRcon("/stop")
+		except RCON_error:
+			strReturn = "SOME ERROR"
+
+		if not strReturn:
+			try:
+				proc.kill()
+			except Exception as e:
+				raise Server_notStopping(e)
+
+		time.sleep(1)
+		if psutil.pid_exists(proc.pid):
+			if psutil.Process(pid=proc.pid).name == proc.name():
+				raise Server_notStopping()
 
 def start():
-	"""returns
-	0	-	All OK
-	-1	-	Server already running / Lockfile exists
-	-2	-	Lockfile could not be created
+	"""throws
+	Server_isRunning
+	Server_notStarting
 	"""
-    #do some starting stuff
-    
-    if os.path.isfile(settings.LockFile):
-		return -1
-	
-    #Create a Lockfile
-    try:
-		os.open(settings.LockFile,'w')
-	catch OSError:
-		return -2 
-		
-    return 0
+	proc = getServer()
+	if not proc:
+		try:
+			"""start server"""
+		except Exception as e:
+			raise Server_notStarting(e)
+	else:
+		raise Server_isRunning()
 
 def save():
-    """throws
-	UnicodeDecodeError
-	RCONAuthenticationError
-	RCONCommunicationError
-	RCONMessageError
-	"""
-	
-	"""returns
-	0	-	All Ok
-	-1	-	Server not running
-	"""
-	
-	if !os.path.isfile(settings.LockFile):
-		return -1
-    
-    strReturn = runRcon("/save")
+	"""throws
+	RCON_error
 
-    return 0
+	Sever_notRunning
+	"""
+	
+	proc = getServer()
+	if proc:
+		try:
+			strReturn = runRcon("/save")
+		except Exception e:
+			raise RCON_error(e)
+
+		return
+
+	raise Server_notRunning()
 
 def update():
-	"""returns
-	0	-	All Ok
-	-1	-	Lockfile could not be removed / Server could not be stopped
+	"""throws
+	Server_notStarting
+	Server_notStopping
+	Server_UpdateFailed
 	"""
-	
-	intErrorCode = backup(0)
-	if intErrorCode == -1:
-		return -1
-		
-	#Run Steam CMD with Params
-	
-	return 0:
+
+	try:
+		backup(0)
+	except Server_notStopping as e:
+		raise Server_notStopping(e)
+	except Server_notStarting as e:
+		raise Server_notStarting(e)
+
+	try:
+		#Run Steam CMD with Params
+		subprocess.run(settings.steamCMD+" +login anonymous +force_install_dir "+settings.ServerPath+" +app_update 565060 validate")
+	except Exception as e:
+		raise Server_UpdateFailed(e)
+
+def getServer():
+	for proc in psutil.process_iter():
+		if proc.name() == "AvorionServer":
+			return proc
