@@ -140,6 +140,11 @@ async def servSave(ctx):
         await log(strText)
         await ctx.send(strText)	
 
+@bot.command()
+async def args(ctx, arg):
+    await ctx.send(arg)
+
+
 
 async def log(strLoggingText):
     strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
