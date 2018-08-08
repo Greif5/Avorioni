@@ -4,6 +4,7 @@ from discord.ext import commands
 import os.path
 import subprocess
 import settings
+import ArkServer
 import AvorionServer
 import FactorioServer
 from exceptionClasses import *
@@ -150,11 +151,20 @@ async def start(ctx, *args):
     if args:
         for arg in args:
             if arg.lower() in "ark":
-                await ctx.send("ist Ark")
+                try:
+                    ArkServer.start()
+                    await ctx.send("ArkServer ist gestartet")
+                except Server_notStarting as e:
+                    await ctx.send("ArkServer konnte nicht gestartet werden")
+                    await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+                except Server_isRunning as e:
+                    await ctx.send("ArkServer läuft bereits")
                 return
+
             elif arg.lower() in "avorion":
                 await ctx.send("ist Avorion")
                 return
+
             elif arg.lower() in "factorio":
                 try:
                     FactorioServer.start()
@@ -176,11 +186,18 @@ async def stop(ctx, *args):
     if args:
         for arg in args:
             if arg.lower() in "ark":
-                await ctx.send("ist Ark")
+                try:
+                    ArkServer.stop()
+                    await ctx.send("ArkServer ist gestoppt")
+                except Server_notStopping as e:
+                    await ctx.send("ArkServer konnte nicht gestoppt werden")
+                    await ctx.send("Der Fehler lautet:```"+str(e)+"```")
                 return
+
             elif arg.lower() in "avorion":
                 await ctx.send("ist Avorion")
                 return
+
             elif arg.lower() in "factorio":
                 try:
                     FactorioServer.stop()
@@ -201,11 +218,18 @@ async def save(ctx, *args):
     if args:
         for arg in args:
             if arg.lower() in "ark":
-                await ctx.send("ist Ark")
+                try:
+                    ArkServer.save()
+                    await ctx.send("ArkServer wurde gesichert")
+                except Server_notRunning as e:
+                    await ctx.send("ArkServer konnte nicht gesichert werden")
+                    await ctx.send("Der Fehler lautet:```"+str(e)+"```")
                 return
+
             elif arg.lower() in "avorion":
                 await ctx.send("ist Avorion")
                 return
+
             elif arg.lower() in "factorio":
                 try:
                     FactorioServer.save()
