@@ -110,7 +110,7 @@ def save():
 	if proc:
 		try:
 			strReturn = runRcon("/save")
-		except Exception e:
+		except Exception as e:
 			raise RCON_error(e)
 
 		return

@@ -1,9 +1,12 @@
 import asyncio
 import discord
 from discord.ext import commands
+import os.path
 import subprocess
 import settings
 import AvorionServer
+import FactorioServer
+from exceptionClasses import *
 
 from time import localtime, strftime
 bot = commands.Bot(command_prefix="!", description="Gameserver Bot")
@@ -60,7 +63,7 @@ async def answer(ctx):
 
     await log(strAnswer)
     await ctx.send(strAnswer)
-
+"""
 @bot.command()
 async def servStop(ctx):
     strText = "stoppe Avorion Server"
@@ -73,7 +76,7 @@ async def servStop(ctx):
         await log(strText)
         await ctx.send(strText)
     except UnicodeDecodeError:
-		
+
 @bot.command()
 @is_admin()
 async def servBackup(ctx):
@@ -139,17 +142,51 @@ async def servSave(ctx):
 		strText = "Es ging etwas schief"
         await log(strText)
         await ctx.send(strText)	
+"""
+@bot.command()
+async def args(ctx, *args):
+    if not args:
+        await ctx.send("Bitte gib ein Argument an")
+    else:
+        #for arg in args:
+            #await ctx.send(arg)
+
+        cli_return = os.popen("ls /").read()
+
+        await ctx.send(cli_return)
 
 @bot.command()
-async def args(ctx, arg):
-    await ctx.send(arg)
+@is_admin()
+async def start(ctx, *args):
+    if args:
+        for arg in args:
+            if arg.lower() in "ark":
+                await ctx.send("ist Ark")
+                return
+            elif arg.lower() in "avorion":
+                await ctx.send("ist Avorion")
+                return
+            elif arg.lower() in "factorio":
+                try:
+                    FactorioServer.start()
+                    await ctx.send("FactorioServer ist gestartet")
+                except Server_notStarting as e:
+                    await ctx.send("FactorioServer konnte nicht gestartet werden")
+                    await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+                return
+            elif arg.lower() in "user":
+                processCall = subprocess.run("whoami", stdout=subprocess.PIPE)
+                await ctx.send(processCall.stdout)
+                return
 
+    await ctx.send("Bitte gib einen Server zum Starten an.")
+    await ctx.send("```!start Ark|Avorion|Factorio```")
 
 
 async def log(strLoggingText):
     strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
     print(strLoggingText)
-    await settings.bot_debug.send(strLoggingText)
+    #await settings.bot_debug.send(strLoggingText)
 
 
 bot.run(settings.bot_id, loop="botloop")

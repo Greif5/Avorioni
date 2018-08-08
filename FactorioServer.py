@@ -1,7 +1,8 @@
 import datetime
 import settings
-import os.path
+import subprocess
 from exceptionClasses import *
+
 
 def backup(intParam=1):
     """throws
@@ -82,8 +83,8 @@ def start():
         raise Server_isRunning()
     """
     try:
-        os.system("/home/potato/GameServer/startFactorio.sh")
-    except Exception e:
+        subprocess.run(settings.Factorio_Launcher+" start",shell=True, check=True)
+    except Exception as e:
         raise Server_notStarting(e)
 
 def save():
