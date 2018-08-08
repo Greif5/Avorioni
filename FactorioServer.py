@@ -56,7 +56,8 @@ def start():
     Server_notStarting
     """
     try:
-        subprocess.run(settings.Factorio_Launcher+" start",shell=True, check=True,stdout=subprocess.PIPE)
+        if "server already running." in str(subprocess.run(settings.Factorio_Launcher+" start",shell=True, check=True,stdout=subprocess.PIPE).stdout).lower():
+            raise Server_isRunning("Server läuft schon")
     except Exception as e:
         raise Server_notStarting(e)
 

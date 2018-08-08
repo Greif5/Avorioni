@@ -162,6 +162,8 @@ async def start(ctx, *args):
                 except Server_notStarting as e:
                     await ctx.send("FactorioServer konnte nicht gestartet werden")
                     await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+                except Server_isRunning as e:
+                    await ctx.send("FactorioServer läuft bereits")
                 return
 
     await ctx.send("Bitte gib einen Server zum Starten an.")
