@@ -143,17 +143,6 @@ async def servSave(ctx):
         await log(strText)
         await ctx.send(strText)	
 """
-@bot.command()
-async def args(ctx, *args):
-    if not args:
-        await ctx.send("Bitte gib ein Argument an")
-    else:
-        #for arg in args:
-            #await ctx.send(arg)
-
-        cli_return = os.popen("ls /").read()
-
-        await ctx.send(cli_return)
 
 @bot.command()
 @is_admin()
@@ -173,10 +162,6 @@ async def start(ctx, *args):
                 except Server_notStarting as e:
                     await ctx.send("FactorioServer konnte nicht gestartet werden")
                     await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-                return
-            elif arg.lower() in "user":
-                processCall = subprocess.run("whoami", stdout=subprocess.PIPE)
-                await ctx.send(processCall.stdout)
                 return
 
     await ctx.send("Bitte gib einen Server zum Starten an.")
