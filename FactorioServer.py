@@ -21,11 +21,11 @@ def backup(intParam=1):
         # Time cheatsheet: http://strftime.org/
         dtNow = datetime.datetime.now()
         strNow = dtNow.strftime('%Y-%m-%d_%H-%M-%S')
-        strBak = settings.BackupPath + settings.BackupName + "_" + strNow + ".tgz"
+        strBak = settings.Factorio_BackupPath + settings.Factorio_BackupName + "_" + strNow + ".tgz"
 
         # Run backup
         with tarfile.open(strBak, "w:gz") as tar:
-            tar.add(settings.ServerPath, arcname=os.path.basename(settings.ServerPath))
+            tar.add(settings.Factorio_Path, arcname=os.path.basename(settings.Factorio_Path))
 
         if intParam:
             try:
@@ -43,7 +43,7 @@ def stop():
     """throws
     Sever_notStopping
     """
-
+    """
     proc = getServer()
     if proc:
         try:
@@ -65,6 +65,11 @@ def stop():
         if psutil.pid_exists(proc.pid):
             if psutil.Process(pid=proc.pid).name == proc.name():
                 raise Server_notStopping()
+    """
+    try:
+        subprocess.run(settings.Factorio_Launcher+" stop",shell=True, check=True)
+    except Exception as e:
+        raise Sever_notStopping(e)
 
 
 def start():
@@ -72,20 +77,11 @@ def start():
     Server_isRunning
     Server_notStarting
     """
-    """
-    proc = getServer()
-    if not proc:
-        try:
-            #start server
-        except Exception as e:
-            raise Server_notStarting(e)
-    else:
-        raise Server_isRunning()
-    """
     try:
         subprocess.run(settings.Factorio_Launcher+" start",shell=True, check=True)
     except Exception as e:
         raise Server_notStarting(e)
+
 
 def save():
     """throws
@@ -105,8 +101,13 @@ def save():
 
     raise Server_notRunning()
     """
+    try:
+        subprocess.run(settings.Factorio_Launcher+" save",shell=True, check=True)
+    except Exception as e:
+        raise Sever_notRunning(e)
+
 
 def getServer():
-	for proc in psutil.process_iter():
-		if proc.name() == "factorio":
-			return proc
+    for proc in psutil.process_iter():
+        if proc.name() == "factorio":
+            return proc
