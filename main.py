@@ -168,6 +168,55 @@ async def start(ctx, *args):
     await ctx.send("```!start Ark|Avorion|Factorio```")
 
 
+@bot.command()
+@is_admin()
+async def stop(ctx, *args):
+    if args:
+        for arg in args:
+            if arg.lower() in "ark":
+                await ctx.send("ist Ark")
+                return
+            elif arg.lower() in "avorion":
+                await ctx.send("ist Avorion")
+                return
+            elif arg.lower() in "factorio":
+                try:
+                    FactorioServer.stop()
+                    await ctx.send("FactorioServer ist gestoppt")
+                except Server_notStopping as e:
+                    await ctx.send("FactorioServer konnte nicht gestoppt werden")
+                    await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+                return
+
+    await ctx.send("Bitte gib einen Server zum Stoppen an.")
+    await ctx.send("```!stop Ark|Avorion|Factorio```")
+
+
+
+@bot.command()
+@is_admin()
+async def save(ctx, *args):
+    if args:
+        for arg in args:
+            if arg.lower() in "ark":
+                await ctx.send("ist Ark")
+                return
+            elif arg.lower() in "avorion":
+                await ctx.send("ist Avorion")
+                return
+            elif arg.lower() in "factorio":
+                try:
+                    FactorioServer.save()
+                    await ctx.send("FactorioServer wurde gesichert")
+                except Server_notRunning as e:
+                    await ctx.send("FactorioServer konnte nicht gesichert werden")
+                    await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+                return
+
+    await ctx.send("Bitte gib einen Server zum Sichern an.")
+    await ctx.send("```!save Ark|Avorion|Factorio```")
+
+
 async def log(strLoggingText):
     strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
     print(strLoggingText)

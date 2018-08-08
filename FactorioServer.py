@@ -41,35 +41,14 @@ def backup(intParam=1):
 
 def stop():
     """throws
-    Sever_notStopping
-    """
-    """
-    proc = getServer()
-    if proc:
-        try:
-            save()
-        except Server_notRunning():
-            return
-        try:
-            strReturn = runRcon("/stop")
-        except RCON_error:
-            strReturn = "SOME ERROR"
-
-        if not strReturn:
-            try:
-                proc.kill()
-            except Exception as e:
-                raise Server_notStopping(e)
-
-        time.sleep(1)
-        if psutil.pid_exists(proc.pid):
-            if psutil.Process(pid=proc.pid).name == proc.name():
-                raise Server_notStopping()
+    Server_notStopping
     """
     try:
-        subprocess.run(settings.Factorio_Launcher+" stop",shell=True, check=True)
+
+        if "no running server" in str(subprocess.run(settings.Factorio_Launcher+" stop",shell=True, check=True,stdout=subprocess.PIPE).stdout).lower():
+            raise Server_notStopping("Kein Server gefunden")
     except Exception as e:
-        raise Sever_notStopping(e)
+        raise Server_notStopping(e)
 
 
 def start():
@@ -78,7 +57,7 @@ def start():
     Server_notStarting
     """
     try:
-        subprocess.run(settings.Factorio_Launcher+" start",shell=True, check=True)
+        subprocess.run(settings.Factorio_Launcher+" start",shell=True, check=True,stdout=subprocess.PIPE)
     except Exception as e:
         raise Server_notStarting(e)
 
@@ -87,24 +66,13 @@ def save():
     """throws
     RCON_error
 
-    Sever_notRunning
-    """
-    """
-    proc = getServer()
-    if proc:
-        try:
-            strReturn = runRcon("/save")
-        except Exception e:
-            raise RCON_error(e)
-
-        return
-
-    raise Server_notRunning()
+    Server_notRunning
     """
     try:
-        subprocess.run(settings.Factorio_Launcher+" save",shell=True, check=True)
+        if "unable to send cmd to a stopped server!" in str(subprocess.run(settings.Factorio_Launcher+" cmd /server-save",shell=True, check=True,stdout=subprocess.PIPE).stdout).lower():
+            raise Server_notRunning("Kein Server gefunden")
     except Exception as e:
-        raise Sever_notRunning(e)
+        raise Server_notRunning(e)
 
 
 def getServer():
