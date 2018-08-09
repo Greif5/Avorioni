@@ -20,6 +20,27 @@ def is_admin():
 
 	return commands.check(invo)
 
+
+def is_ark():
+	def invo(ctx):
+		return ctx.author.id in settings.list_Ark
+
+	return commands.check(invo)
+
+
+def is_avorion():
+	def invo(ctx):
+		return ctx.author.id in settings.list_Avorion
+
+	return commands.check(invo)
+
+
+def is_factorio():
+	def invo(ctx):
+		return ctx.author.id in settings.list_Factorio
+
+	return commands.check(invo)
+
 @bot.event
 async def on_ready():
 	print('Logged in as')
@@ -57,29 +78,39 @@ async def start(ctx, *args):
 	if args:
 		for arg in args:
 			if arg.lower() in "ark":
-				try:
-					ArkServer.start()
-					await ctx.send("ArkServer ist gestartet")
-				except Server_notStarting as e:
-					await ctx.send("ArkServer konnte nicht gestartet werden")
-					await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-				except Server_isRunning as e:
-					await ctx.send("ArkServer läuft bereits")
+				if ctx.author.id in settings.list_Ark:
+					try:
+						ArkServer.start()
+						await ctx.send("ArkServer ist gestartet")
+					except Server_notStarting as e:
+						await ctx.send("ArkServer konnte nicht gestartet werden")
+						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+					except Server_isRunning as e:
+						await ctx.send("ArkServer läuft bereits")
+				else:
+					await ctx.send("DU darfst den Server nicht befehlen")
+
 				return
 
 			elif arg.lower() in "avorion":
-				await ctx.send("ist Avorion")
+				if ctx.author.id in settings.list_Avorion:
+					await ctx.send("ist Avorion")
+				else:
+					await ctx.send("DU darfst den Server nicht befehlen")
 				return
 
 			elif arg.lower() in "factorio":
-				try:
-					FactorioServer.start()
-					await ctx.send("FactorioServer ist gestartet")
-				except Server_notStarting as e:
-					await ctx.send("FactorioServer konnte nicht gestartet werden")
-					await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-				except Server_isRunning as e:
-					await ctx.send("FactorioServer läuft bereits")
+				if ctx.author.id in settings.list_Factorio:
+					try:
+						FactorioServer.start()
+						await ctx.send("FactorioServer ist gestartet")
+					except Server_notStarting as e:
+						await ctx.send("FactorioServer konnte nicht gestartet werden")
+						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+					except Server_isRunning as e:
+						await ctx.send("FactorioServer läuft bereits")
+				else:
+					await ctx.send("DU darfst den Server nicht befehlen")
 				return
 
 	await ctx.send("Bitte gib einen Server zum Starten an.")
@@ -92,25 +123,37 @@ async def stop(ctx, *args):
 	if args:
 		for arg in args:
 			if arg.lower() in "ark":
-				try:
-					ArkServer.stop()
-					await ctx.send("ArkServer ist gestoppt")
-				except Server_notStopping as e:
-					await ctx.send("ArkServer konnte nicht gestoppt werden")
-					await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+				if ctx.author.id in settings.list_Ark:
+					try:
+						ArkServer.stop()
+						await ctx.send("ArkServer ist gestoppt")
+					except Server_notStopping as e:
+						await ctx.send("ArkServer konnte nicht gestoppt werden")
+						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+				else:
+					await ctx.send("DU darfst den Server nicht befehlen")
+
 				return
 
 			elif arg.lower() in "avorion":
-				await ctx.send("ist Avorion")
+				if ctx.author.id in settings.list_Avorion:
+					await ctx.send("ist Avorion")
+				else:
+					await ctx.send("DU darfst den Server nicht befehlen")
+
 				return
 
 			elif arg.lower() in "factorio":
-				try:
-					FactorioServer.stop()
-					await ctx.send("FactorioServer ist gestoppt")
-				except Server_notStopping as e:
-					await ctx.send("FactorioServer konnte nicht gestoppt werden")
-					await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+				if ctx.author.id in settings.list_Factorio:
+					try:
+						FactorioServer.stop()
+						await ctx.send("FactorioServer ist gestoppt")
+					except Server_notStopping as e:
+						await ctx.send("FactorioServer konnte nicht gestoppt werden")
+						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+				else:
+					await ctx.send("DU darfst den Server nicht befehlen")
+
 				return
 
 	await ctx.send("Bitte gib einen Server zum Stoppen an.")
