@@ -1,10 +1,10 @@
-import  datetime
-import  settings
-import  subprocess
-import  tarfile
+import	datetime
+import	settings
+import	subprocess
+import	tarfile
 import	time
-import  valve.rcon
-import  os.path
+import	valve.rcon
+import	os.path
 import	psutil
 from exceptionClasses import *
 
@@ -43,11 +43,12 @@ def backup(intParam = 1):
 	except Server_notStopping as e:
 		raise Server_notStopping(e)
 
+
 def runRcon(strCommand):
 	"""throws
 	RCON_error
-    """
-    
+	"""
+
 	"""returns
 	string
 	"""
@@ -58,10 +59,11 @@ def runRcon(strCommand):
 
 	return strReturn
 
+
 def stop():
 	"""throws
-    Sever_notStopping
-    """
+	Sever_notStopping
+	"""
 
 	proc = getServer()
 	if proc:
@@ -85,6 +87,7 @@ def stop():
 			if psutil.Process(pid=proc.pid).name == proc.name():
 				raise Server_notStopping()
 
+
 def start():
 	"""throws
 	Server_isRunning
@@ -98,6 +101,7 @@ def start():
 			raise Server_notStarting(e)
 	else:
 		raise Server_isRunning()
+
 
 def save():
 	"""throws
@@ -117,6 +121,7 @@ def save():
 
 	raise Server_notRunning()
 
+
 def update():
 	"""throws
 	Server_notStarting
@@ -132,10 +137,11 @@ def update():
 		raise Server_notStarting(e)
 
 	try:
-		#Run Steam CMD with Params
+		# Run Steam CMD with Params
 		subprocess.run(settings.steamCMD+" +login anonymous +force_install_dir "+settings.ServerPath+" +app_update 565060 validate")
 	except Exception as e:
 		raise Server_UpdateFailed(e)
+
 
 def getServer():
 	for proc in psutil.process_iter():
