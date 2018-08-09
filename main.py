@@ -1,13 +1,13 @@
-import  asyncio
-import  discord
-from    discord.ext         import commands
-import  os.path
-import  subprocess
-import  settings
-import  ArkServer
-import  AvorionServer
-import  FactorioServer
-from    exceptionClasses    import *
+import	asyncio
+import	discord
+from	discord.ext         import commands
+import	os.path
+import	subprocess
+import	settings
+import	ArkServer
+import	AvorionServer
+import	FactorioServer
+from	exceptionClasses    import *
 
 from time import localtime, strftime
 bot = commands.Bot(command_prefix="!", description="Gameserver Bot")
@@ -27,20 +27,9 @@ async def on_ready():
 	print('------')
 	print(bot.guilds)
 
-"""
-    for guild in bot.guilds:
-        print(guild.name)
-        print(guild.channels)
-        for channel in guild.channels:
-            if channel.name == "botbay":
-                print(channel.id)
-                print("bay found in:"+guild.name+" "+channel.name +"-"+ str(channel.id))
-                channel.send("Hello Master!")
-                bot_debug = channel
-"""
-    settings.bot_debug = bot.get_channel(settings.bot_debug_id)
+	settings.bot_debug = bot.get_channel(settings.bot_debug_id)
 
-
+@is_admin()
 @bot.command()
 async def changename(ctx, *, name: str):
 	if ctx.author.id in settings.list_Admins:
@@ -48,12 +37,6 @@ async def changename(ctx, *, name: str):
 		await ctx.send(ctx.author.mention + " - Changed name to: " + name)
 	else:
 		return
-
-@bot.command()
-@is_admin()
-async def startsrv(ctx):
-	tmpmsg = await ctx.send(ctx.author.mention + " - Starting server.")
-	startsh = subprocess.call("./startserver.sh")
 
 @bot.command()
 async def answer(ctx):
@@ -65,86 +48,6 @@ async def answer(ctx):
 
 	await log(strAnswer)
 	await ctx.send(strAnswer)
-"""
-@bot.command()
-async def servStop(ctx):
-	strText = "stoppe Avorion Server"
-	await log(strText)
-	await ctx.send(strText)
-
-	try:
-		AvorionServer.stop()
-		strText = "Server gestopt"
-		await log(strText)
-		await ctx.send(strText)
-	except UnicodeDecodeError:
-
-@bot.command()
-@is_admin()
-async def servBackup(ctx):
-	strText = "Erstelle Backup"
-	await log(strText)
-	await ctx.send(strText)
-	
-	try:
-		intErrorCode = AvorionServer.backup()
-		if !intErrorCode:
-			strText = "Backup erstellt"
-		elif intErrorCode == -1 
-			strText = "Backup konnte nicht erstellt werden"
-		elif intErrorCode == -2
-			strText = "Server konnte nicht gestoppt werden"
-		elif intErrorCode == -3
-			strText = "Server konnte nicht gestartet werden"
-		
-		await log(strText)
-		await ctx.send(strText)
-	except UnicodeDecodeError:
-		strText = "Es ging etwas schief"
-		await log(strText)
-		await ctx.send(strText)
-
-@bot.command()
-@is_admin()
-async def servRestart(ctx):
-	strText = "Starte den Server neu"
-	await log(strText)
-	await ctx.send(strText)
-	
-	try:
-		if !AvorionServer.stop():
-			if !AvorionServer.start():
-				strText = "Server gestartet"
-			else
-				strText = "Server konnte nicht gestartet werden"
-		else
-			strText = "Server konnte nicht gestoppt werden"
-		await log(strText)
-		await ctx.send(strText)
-	except UnicodeDecodeError:
-		strText = "Es ging etwas schief"
-		await log(strText)
-		await ctx.send(strText)
-
-@bot.command()
-async def servSave(ctx):
-	strText = "Erstelle Speicherpunkt"
-	await log(strText)
-	await ctx.send(strText)
-	
-	try:
-		if !AvorionServer.stop():
-			strText = "Gesichert"
-		else
-			strText = "Server läuft nicht"
-		
-		await log(strText)
-		await ctx.send(strText)
-	except UnicodeDecodeError:
-		strText = "Es ging etwas schief"
-		await log(strText)
-		await ctx.send(strText)	
-"""
 
 
 @bot.command()
