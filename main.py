@@ -7,6 +7,7 @@ import	settings
 import	ArkServer
 import	AvorionServer
 import	FactorioServer
+import	sys
 from	exceptionClasses    import *
 
 from time import localtime, strftime
@@ -148,9 +149,9 @@ async def save(ctx, *args):
 
 
 async def log(strLoggingText):
-	strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
-	print(strLoggingText)
-	# await settings.bot_debug.send(strLoggingText)
-
+	if any(strElement in ("-l", "--logging") for strElement in sys.argv):
+		strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
+		print(strLoggingText)
+		await settings.bot_debug.send(strLoggingText)
 
 bot.run(settings.bot_id, loop="botloop")
