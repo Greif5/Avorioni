@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d7ac8b57-5ab6-4b3d-a664-49636aed773c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/ArkServer.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArkServer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AvorionServer.py" beforeDir="false" afterPath="$PROJECT_DIR$/AvorionServer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FactorioServer.py" beforeDir="false" afterPath="$PROJECT_DIR$/FactorioServer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/exceptionClasses.py" beforeDir="false" afterPath="$PROJECT_DIR$/exceptionClasses.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -40,26 +36,25 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="2559" />
+          <entry key="py" value="2572" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="2559" />
+          <entry key="Python" value="2572" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="494">
-              <caret line="40" column="63" lean-forward="true" selection-start-line="40" selection-start-column="63" selection-end-line="40" selection-end-column="63" />
+            <state relative-caret-position="135">
+              <caret line="9" column="4" lean-forward="true" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
               <folding>
-                <element signature="e#0#15#0" expanded="true" />
-                <marker date="1533795704057" expanded="true" signature="3504:6162" ph="..." />
+                <marker date="1533796627476" expanded="true" signature="1186:3844" ph="..." />
               </folding>
             </state>
           </provider>
@@ -110,11 +105,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/exceptionClasses.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
+            <state relative-caret-position="105">
+              <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
             </state>
           </provider>
         </entry>
@@ -137,9 +132,9 @@
         <option value="$PROJECT_DIR$/FactorioServer.py" />
         <option value="$PROJECT_DIR$/AvorionServer.py" />
         <option value="$PROJECT_DIR$/exceptionClasses.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/settings.py" />
         <option value="$PROJECT_DIR$/ArkServer.py" />
+        <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
@@ -322,17 +317,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="494">
-          <caret line="40" column="63" lean-forward="true" selection-start-line="40" selection-start-column="63" selection-end-line="40" selection-end-column="63" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-            <marker date="1533795704057" expanded="true" signature="3504:6162" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
@@ -352,8 +336,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/exceptionClasses.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
+        <state relative-caret-position="105">
+          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="4" lean-forward="true" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
+          <folding>
+            <marker date="1533796627476" expanded="true" signature="1186:3844" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
