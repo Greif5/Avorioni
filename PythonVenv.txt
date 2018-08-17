@@ -9,3 +9,7 @@ pip3 install asyncio
 pip3 install -U https://github.com/Rapptz/discord.py/archive/rewrite.zip
 pip3 install python-valve
 pip3 install psutil
+
+
+source /home/*/*/Avorioni/bin/activate
+python3 /home/seb/Git/Avorioni/main.py
