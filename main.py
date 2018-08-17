@@ -1,43 +1,19 @@
 import	asyncio
 import	discord
 from	discord.ext         import commands
-import	os.path
-import	subprocess
 import	settings
 import	ArkServer
 import	AvorionServer
 import	FactorioServer
 import	sys
 from	exceptionClasses    import *
-
 from time import localtime, strftime
-bot = commands.Bot(command_prefix="!", description="Gameserver Bot")
 
+bot = commands.Bot(command_prefix="!", description="Gameserver Bot")
 
 def is_admin():
 	def invo(ctx):
 		return ctx.author.id in settings.list_Admins
-
-	return commands.check(invo)
-
-
-def is_ark():
-	def invo(ctx):
-		return ctx.author.id in settings.list_Ark
-
-	return commands.check(invo)
-
-
-def is_avorion():
-	def invo(ctx):
-		return ctx.author.id in settings.list_Avorion
-
-	return commands.check(invo)
-
-
-def is_factorio():
-	def invo(ctx):
-		return ctx.author.id in settings.list_Factorio
 
 	return commands.check(invo)
 
