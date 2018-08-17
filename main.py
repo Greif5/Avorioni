@@ -166,6 +166,33 @@ async def save(ctx, *args):
 	await ctx.send("Bitte gib einen Server zum Sichern an.")
 	await ctx.send("```!save Ark|Avorion|Factorio```")
 
+@bot.command()
+async def status(ctx, *args):
+	if args:
+		for arg in args:
+			if arg.lower() in "ark":
+				try:
+					await ctx.send(ArkServer.status())
+				except Server_notRunning as e:
+					await ctx.send("ArkServer läuft nicht")
+					await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+				return
+
+			elif arg.lower() in "avorion":
+				await ctx.send("Avorion hat diese Funktion noch nicht")
+				return
+
+			elif arg.lower() in "factorio":
+				try:
+					await ctx.send(FactorioServer.save())
+				except Server_notRunning as e:
+					await ctx.send("FactorioServer läuft nicht")
+					await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+				return
+
+	await ctx.send("Bitte gib einen Server zum Sichern an.")
+	await ctx.send("```!status Ark|Avorion|Factorio```")
+
 
 async def log(strLoggingText):
 	if any(strElement in ("-l", "--logging") for strElement in sys.argv):
