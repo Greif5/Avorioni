@@ -1,2 +1,2 @@
 # Avorioni
-Discord Bot to controll an Avorion Server
+Discord Bot to controll a bunch of gameserver.
