@@ -49,7 +49,6 @@ async def answer(ctx):
 
 
 @bot.command()
-@is_admin()
 async def start(ctx, *args):
 	if args:
 		for arg in args:
@@ -94,7 +93,6 @@ async def start(ctx, *args):
 
 
 @bot.command()
-@is_admin()
 async def stop(ctx, *args):
 	if args:
 		for arg in args:
@@ -137,7 +135,6 @@ async def stop(ctx, *args):
 
 
 @bot.command()
-@is_admin()
 async def save(ctx, *args):
 	if args:
 		for arg in args:
