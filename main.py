@@ -1,15 +1,56 @@
+from 	time 				import localtime, strftime
+from	discord.ext			import commands
+from	exceptionClasses	import *
 import	asyncio
+import	atexit
 import	discord
-from	discord.ext         import commands
-import	settings
 import	ArkServer
 import	AvorionServer
 import	FactorioServer
+import	os
 import	sys
-from	exceptionClasses    import *
-from time import localtime, strftime
+import	settings
+
+
+"""
+Parameter:
+
+-c	--clear
+	deletes Lockfile, exits.
+	
+-f	--force
+	forces start even with existing lockfile
+	
+-l	--logging
+	logs stuff
+
+"""
+
+if any(strElement in ("-c", "--clear") for strElement in sys.argv):
+	try:
+		os.remove(settings.LockFile)
+		print("Lockfile entfernt")
+	except Exception as e:
+		print("Lockfile konnte nicht entfernt werden" + str(e))
+	sys.exit()
+
+if os.path.isfile(settings.LockFile):
+	if not any(strElement in ("-f", "--force") for strElement in sys.argv):
+		print("Server läuft bereits.")
+		sys.exit()
+else:
+	f = open(settings.LockFile, "w+")
+	f.close()
+
 
 bot = commands.Bot(command_prefix="!", description="Gameserver Bot")
+
+"""
+**************************************************************************************
+Bot only Funktions
+**************************************************************************************
+"""
+
 
 def is_admin():
 	def invo(ctx):
@@ -46,7 +87,6 @@ async def answer(ctx):
 
 	await log(strAnswer)
 	await ctx.send(strAnswer)
-
 
 @bot.command()
 async def start(ctx, *args):
@@ -91,7 +131,6 @@ async def start(ctx, *args):
 	await ctx.send("Bitte gib einen Server zum Starten an.")
 	await ctx.send("```!start Ark|Avorion|Factorio```")
 
-
 @bot.command()
 async def stop(ctx, *args):
 	if args:
@@ -133,7 +172,6 @@ async def stop(ctx, *args):
 	await ctx.send("Bitte gib einen Server zum Stoppen an.")
 	await ctx.send("```!stop Ark|Avorion|Factorio```")
 
-
 @bot.command()
 async def save(ctx, *args):
 	if args:
@@ -149,6 +187,7 @@ async def save(ctx, *args):
 
 			elif arg.lower() in "avorion":
 				await ctx.send("ist Avorion")
+				#AvorionServer.save()
 				return
 
 			elif arg.lower() in "factorio":
@@ -190,6 +229,25 @@ async def status(ctx, *args):
 	await ctx.send("Bitte gib einen Server zum Sichern an.")
 	await ctx.send("```!status Ark|Avorion|Factorio```")
 
+@is_admin()
+@bot.command()
+async def kill(ctx):
+	await ctx.send("Yes Master.")
+	await bot.close()
+
+"""
+**************************************************************************************
+Python only Funktions
+**************************************************************************************
+"""
+
+
+def exit_Kontroll():
+	try:
+		os.remove(settings.LockFile)
+	except Exception as e:
+		print("Lockfile konnte nicht entfernt werden" + str(e))
+
 
 async def log(strLoggingText):
 	if any(strElement in ("-l", "--logging") for strElement in sys.argv):
@@ -197,4 +255,6 @@ async def log(strLoggingText):
 		print(strLoggingText)
 		await settings.bot_debug.send(strLoggingText)
 
+
+atexit.register(exit_Kontroll)
 bot.run(settings.bot_id, loop="botloop")
