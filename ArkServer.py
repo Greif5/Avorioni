@@ -82,8 +82,8 @@ def status():
 	Server_notRunning
 	"""
 	try:
-		return str(subprocess.run(settings.Ark_Launcher+" status",shell=True, check=True,stdout=subprocess.PIPE).stdout).encode("utf8")
-		
+		strReturn =  subprocess.run(settings.Ark_Launcher+" status",shell=True, check=True,stdout=subprocess.PIPE).stdout.decode("UTF-8")
+		return str(strReturn)
 	except Exception as e:
 		raise Server_notRunning(e)
 
