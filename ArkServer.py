@@ -83,7 +83,10 @@ def status():
 	"""
 	try:
 		strReturn =  subprocess.run(settings.Ark_Launcher+" status",shell=True, check=True,stdout=subprocess.PIPE).stdout.decode("UTF-8")
-		return str(strReturn)
+		strReturn = strReturn.replace("[0;39m", "")
+		strReturn = strReturn.replace("[1;31m", "")
+		strReturn = strReturn.replace("[1;32m", "")
+		return str("```"+ noEscape(strReturn) +"```")
 	except Exception as e:
 		raise Server_notRunning(e)
 
@@ -91,3 +94,6 @@ def getServer():
 	for proc in psutil.process_iter():
 		if proc.name() == "ark":
 			return proc
+
+# IDK-Funktion to remove weird ASCII-Escape chars
+noEscape = lambda s: "".join(i for i in s if not 27 == ord(i))
