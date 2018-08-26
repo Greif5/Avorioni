@@ -98,17 +98,13 @@ async def start(ctx, *args):
 						ArkServer.start()
 						await ctx.send("ArkServer wird gestartet")
 
-						i = 0
 						for i in range(1):
 							print(ArkServer.isStarted())
 							if ArkServer.isStarted():
-								break
+								await ctx.send("ArkServer ist gestartet")
+								return
 							sleep(60)
-
-						if i == 1:
-							await ctx.send("Der ArkServer braucht unerwartet lange zum starten")
-						else:
-							await ctx.send("ArkServer ist gestartet")
+						await ctx.send("Der ArkServer braucht unerwartet lange zum starten")
 
 					except Server_notStarting as e:
 						await ctx.send("ArkServer konnte nicht gestartet werden")
