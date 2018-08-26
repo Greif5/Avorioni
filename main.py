@@ -98,7 +98,7 @@ async def start(ctx, *args):
 						ArkServer.start()
 						await ctx.send("ArkServer wird gestartet")
 
-						for i in range(60):
+						for i in range(42):
 							print(ArkServer.isStarted())
 							if ArkServer.isStarted():
 								await ctx.send("ArkServer ist gestartet")
