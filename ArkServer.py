@@ -62,6 +62,21 @@ def start():
 		raise Server_notStarting(e)
 
 
+def isStarted():
+	"""throws
+
+	"""
+	try:
+		strStatus = status()
+
+		if "Server listening:" in strStatus:
+			return True
+		else:
+			return False
+	except Exception as e:
+		Server_notRunning(e)
+
+
 def save():
 	"""throws
 	RCON_error
@@ -86,6 +101,8 @@ def status():
 		strReturn = strReturn.replace("[0;39m", "")
 		strReturn = strReturn.replace("[1;31m", "")
 		strReturn = strReturn.replace("[1;32m", "")
+		strReturn = strReturn.replace(" \n",	"\n")
+		strReturn = strReturn.replace("\n ",	"\n")
 		return str("```"+ noEscape(strReturn) +"```")
 	except Exception as e:
 		raise Server_notRunning(e)

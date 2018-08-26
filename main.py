@@ -1,4 +1,4 @@
-from 	time 				import localtime, strftime
+from 	time 				import localtime, strftime, sleep
 from	discord.ext			import commands
 from	exceptionClasses	import *
 import	asyncio
@@ -96,7 +96,13 @@ async def start(ctx, *args):
 				if ctx.author.id in settings.list_Ark:
 					try:
 						ArkServer.start()
+						await ctx.send("ArkServer wird gestartet")
+
+						while not ArkServer.start():
+							sleep(60)
+
 						await ctx.send("ArkServer ist gestartet")
+
 					except Server_notStarting as e:
 						await ctx.send("ArkServer konnte nicht gestartet werden")
 						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
