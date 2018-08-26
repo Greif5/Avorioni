@@ -1,4 +1,5 @@
 import	datetime
+import	re
 import	settings
 import	subprocess
 from	exceptionClasses import *
@@ -69,7 +70,8 @@ def isStarted():
 	try:
 		strStatus = status()
 
-		if "Server listening:" in strStatus:
+		if re.match("Server online:( )*Yes", strStatus):
+			print(strStatus)
 			return True
 		else:
 			return False
