@@ -101,8 +101,7 @@ def status():
 		strReturn = strReturn.replace("[0;39m", "")
 		strReturn = strReturn.replace("[1;31m", "")
 		strReturn = strReturn.replace("[1;32m", "")
-		strReturn = strReturn.replace(" \n",	"\n")
-		strReturn = strReturn.replace("\n ",	"\n")
+		strReturn = strReturn.replace(" Server",	"Server")
 		return str("```"+ noEscape(strReturn) +"```")
 	except Exception as e:
 		raise Server_notRunning(e)
