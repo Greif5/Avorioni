@@ -98,12 +98,12 @@ async def start(ctx, *args):
 						ArkServer.start()
 						await ctx.send("ArkServer wird gestartet")
 
-						for i in range(6):
+						for i in range(60):
 							print(ArkServer.isStarted())
 							if ArkServer.isStarted():
 								await ctx.send("ArkServer ist gestartet")
 								return
-							asyncio.sleep(10)
+							await asyncio.sleep(10)
 						await ctx.send("Der ArkServer braucht unerwartet lange zum starten")
 
 					except Server_notStarting as e:
