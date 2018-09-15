@@ -45,7 +45,8 @@ def stop():
 	"""
 	try:
 		print("1.1 here")
-		strCheck = str(subprocess.run(settings.Factorio_Launcher+" stop",shell=True, check=True,stdout=subprocess.PIPE).stdout)
+		print("##"+subprocess.run(settings.Factorio_Launcher+" stop"+"##")
+		strCheck = str(subprocess.run(settings.Factorio_Launcher+" stop",shell=True, check=True,stdout=subprocess.PIPE,timeout=10).stdout)
 		print("1.2 command called")
 		if "Factorio is not running." in strCheck.lower():
 			print("1.2.1 ERROR")
