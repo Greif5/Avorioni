@@ -74,6 +74,15 @@ def save():
 	except Exception as e:
 		raise Server_notRunning(e)
 
+def status():
+		"""throws
+		Server_notRunning
+		"""
+		try:
+			strReturn = subprocess.run(settings.Factorio_Launcher + " status", shell=True, check=True, stdout=subprocess.PIPE).stdout
+			return str("```" + strReturn + "```")
+		except Exception as e:
+			raise Server_notRunning(e)
 
 def getServer():
 	for proc in psutil.process_iter():

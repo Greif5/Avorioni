@@ -231,7 +231,7 @@ async def status(ctx, *args):
 
 			elif arg.lower() in "factorio":
 				try:
-					await ctx.send(FactorioServer.save())
+					await ctx.send(FactorioServer.status())
 				except Server_notRunning as e:
 					await ctx.send("FactorioServer läuft nicht")
 					await ctx.send("Der Fehler lautet:```"+str(e)+"```")
