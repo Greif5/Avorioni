@@ -1,7 +1,6 @@
 from 	time 				import localtime, strftime, sleep
 from	discord.ext			import commands
 from	exceptionClasses	import *
-from	importlib			import reload
 import	asyncio
 import	atexit
 import	discord
@@ -88,14 +87,6 @@ async def answer(ctx):
 
 	await log(strAnswer)
 	await ctx.send(strAnswer)
-
-@is_admin()
-@bot.command()
-async def reload(ctx, *args):
-	reload(ArkServer)
-	reload(AvorionServer)
-	reload(FactorioServer)
-	await ctx.send("Module neu geladen")
 
 @bot.command()
 async def start(ctx, *args):
