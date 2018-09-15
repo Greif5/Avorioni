@@ -168,9 +168,7 @@ async def stop(ctx, *args):
 			elif arg.lower() in "factorio":
 				if ctx.author.id in settings.list_Factorio:
 					try:
-						print("1. stoppe")
 						FactorioServer.stop()
-						print("2. Stoped")
 						await ctx.send("FactorioServer ist gestoppt")
 					except Server_notStopping as e:
 						await ctx.send("FactorioServer konnte nicht gestoppt werden")

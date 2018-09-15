@@ -93,8 +93,6 @@ def isUsed():
 
 def save():
 	"""throws
-	RCON_error
-
 	Server_notRunning
 	"""
 	try:
@@ -106,8 +104,6 @@ def save():
 
 def status():
 	"""throws
-	RCON_error
-
 	Server_notRunning
 	"""
 	try:

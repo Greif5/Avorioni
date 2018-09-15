@@ -64,8 +64,6 @@ def start():
 
 def save():
 	"""throws
-	RCON_error
-
 	Server_notRunning
 	"""
 	try:
