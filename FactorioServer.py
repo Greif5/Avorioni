@@ -79,7 +79,7 @@ def status():
 		Server_notRunning
 		"""
 		try:
-			strReturn = subprocess.Popen(settings.Factorio_Launcher + " status", shell=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
+			strReturn = subprocess.run(settings.Factorio_Launcher + " status", shell=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
 			return str("```" + strReturn + "```")
 		except Exception as e:
 			raise Server_notRunning(e)
