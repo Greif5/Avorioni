@@ -44,14 +44,8 @@ def stop():
 	Server_notStopping
 	"""
 	try:
-		print("1.1 here")
-		#strCheck = str(subprocess.run(settings.Factorio_Launcher+" stop", shell=True, check=True, stdout=subprocess.PIPE).stdout)
-		strCheck = str(subprocess.Popen(settings.Factorio_Launcher+" stop", shell=True, check=True, stdout=subprocess.PIPE).stdout)
-		print("1.2 command called")
-		if "Factorio is not running." in strCheck.lower():
-			print("1.2.1 ERROR")
+		if "Factorio is not running." in str(subprocess.Popen(settings.Factorio_Launcher+" stop", shell=True, stdout=subprocess.PIPE).stdout).lower():
 			raise Server_notStopping("Kein Server gefunden")
-		print("1.3 funktion done")
 	except Exception as e:
 		raise Server_notStopping(e)
 
