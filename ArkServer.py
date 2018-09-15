@@ -65,19 +65,31 @@ def start():
 
 def isStarted():
 	"""throws
-
+	Server_notRunning
 	"""
 	try:
 		strStatus = status()
 
 		if re.match("Server online:( )*Yes", strStatus):
-			print(strStatus)
 			return True
 		else:
 			return False
 	except Exception as e:
 		Server_notRunning(e)
 
+def isUsed():
+	"""throws
+	Server_notRunning
+	"""
+	try:
+		strStatus = status()
+
+		if re.match("Server online:( )*Yes", strStatus):
+			return True
+		else:
+			return False
+	except Exception as e:
+		Server_notRunning(e)
 
 def save():
 	"""throws
@@ -104,6 +116,8 @@ def status():
 		strReturn = strReturn.replace("[1;31m", "")
 		strReturn = strReturn.replace("[1;32m", "")
 		strReturn = strReturn.replace(" Server",	"Server")
+		strReturn = strReturn.replace(" ARKServers",	"ARKServers")
+		strReturn = strReturn.replace(" Steam connect",	"Steam connect")
 		return str("```"+ noEscape(strReturn) +"```")
 	except Exception as e:
 		raise Server_notRunning(e)
