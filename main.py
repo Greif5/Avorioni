@@ -88,6 +88,14 @@ async def answer(ctx):
 	await log(strAnswer)
 	await ctx.send(strAnswer)
 
+@is_admin()
+@bot.command()
+async def reload(ctx, *args):
+	reload(ArkServer)
+	reload(AvorionServer)
+	reload(FactorioServer)
+	await ctx.send("Module neu geladen")
+
 @bot.command()
 async def start(ctx, *args):
 	if args:
