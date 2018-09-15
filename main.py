@@ -1,6 +1,7 @@
 from 	time 				import localtime, strftime, sleep
 from	discord.ext			import commands
 from	exceptionClasses	import *
+from	importlib			import reload
 import	asyncio
 import	atexit
 import	discord
