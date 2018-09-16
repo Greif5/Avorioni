@@ -37,6 +37,8 @@ def backup(intParam=1):
 
 	except Server_notStopping as e:
 		raise Server_notStopping(e)
+	except Exception as e:
+		print(e)
 
 
 def stop():
