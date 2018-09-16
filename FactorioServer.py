@@ -27,7 +27,8 @@ def backup(intParam=1):
 		strBak = settings.Factorio_BackupPath + settings.Factorio_BackupName + "_" + strNow + ".tgz"
 
 		# Create backupfolder
-		print(os.path.isdir(settings.Factorio_BackupPath))
+		if not os.path.isdir(settings.Factorio_BackupPath):
+			os.makedirs(settings.Factorio_BackupPath)
 
 		# Run backup
 		with tarfile.open(strBak, "w:gz") as tar:
