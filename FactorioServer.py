@@ -3,6 +3,7 @@ import os
 import settings
 import subprocess
 import tarfile
+import time
 from exceptionClasses import *
 
 
@@ -29,6 +30,15 @@ def backup(intParam=1):
 		# Create backupfolder
 		if not os.path.isdir(settings.Factorio_BackupPath):
 			os.makedirs(settings.Factorio_BackupPath)
+
+		# Short waiting periode for the Server to fully stop
+		# The timeout of 20*5s = 100s should give it enough time to fully stop
+		iTimeOut = 0
+		while "Factorio is running." in status():
+			if iTimeOut > 20:
+				raise Server_BackupFailed("Serverstopp Timeout")
+			time.sleep(5)
+			iTimeOut += 1
 
 		# Run backup
 		with tarfile.open(strBak, "w:gz") as tar:
