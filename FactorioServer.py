@@ -26,6 +26,9 @@ def backup(intParam=1):
 		strNow = dtNow.strftime('%Y-%m-%d_%H-%M-%S')
 		strBak = settings.Factorio_BackupPath + settings.Factorio_BackupName + "_" + strNow + ".tgz"
 
+		# Create backupfolder
+		print(os.path.isdir(settings.Factorio_BackupPath))
+
 		# Run backup
 		with tarfile.open(strBak, "w:gz") as tar:
 			tar.add(settings.Factorio_Path, arcname=os.path.basename(settings.Factorio_Path))
