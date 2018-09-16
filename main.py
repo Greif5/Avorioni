@@ -110,6 +110,9 @@ async def backup(ctx, *args):
 					except Server_notStopping as e:
 						await ctx.send("FactorioServer konnte nicht gestoppt werden")
 						await ctx.send("Der Fehler lautet:```" + str(e) + "```")
+					except Server_BackupFailed as e:
+						await ctx.send("FactorioServer konnte nicht gesichert werden")
+						await ctx.send("Bitte schau im Log nach dem Fehler.")
 				else:
 					await ctx.send("DU darfst den Server nicht befehlen")
 				return

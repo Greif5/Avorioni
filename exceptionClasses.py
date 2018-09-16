@@ -1,3 +1,7 @@
+class Server_BackupFailed(Exception):
+	pass
+
+
 class Server_notStopping(Exception):
 	pass
 

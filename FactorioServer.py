@@ -8,6 +8,7 @@ from exceptionClasses import *
 
 def backup(intParam=1):
 	"""throws
+	Server_BackupFailed
 	Server_notStarting
 	Server_notStopping
 	"""
@@ -41,6 +42,7 @@ def backup(intParam=1):
 		raise Server_notStopping(e)
 	except Exception as e:
 		print(e)
+		raise Server_BackupFailed(e)
 
 
 def stop():
