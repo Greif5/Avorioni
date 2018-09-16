@@ -24,7 +24,7 @@ def backup(intParam=1):
 		# Time cheatsheet: http://strftime.org/
 		dtNow = datetime.datetime.now()
 		strNow = dtNow.strftime('%Y-%m-%d_%H-%M-%S')
-		strBak = settings.Factorio_BackupPath + settings.Factorio_BackupName + "_" + strNow + ".tgz"
+		strBak = settings.Factorio_BackupPath +"/"+ settings.Factorio_BackupName + "_" + strNow + ".tgz"
 
 		# Create backupfolder
 		if not os.path.isdir(settings.Factorio_BackupPath):
