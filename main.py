@@ -102,6 +102,7 @@ async def backup(ctx, *args):
 			elif arg.lower() in "factorio":
 				if ctx.author.id in settings.list_Factorio:
 					try:
+						await ctx.send(	"FactorioServer wird gesichert\nDies kann einige Sekunden dauern.")
 						FactorioServer.backup(1)
 						await ctx.send("FactorioServer wurde gesichert")
 					except Server_notStarting as e:
