@@ -76,7 +76,7 @@ def start():
 	Server_notStarting
 	"""
 	try:
-		if "server already running." in str(subprocess.run(settings.Factorio_Launcher+" start",shell=True, check=True,stdout=subprocess.PIPE).stdout).lower():
+		if "server already running." in str(subprocess.run(settings.Factorio_Launcher+" start", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
 			raise Server_isRunning("Server läuft schon")
 	except Exception as e:
 		raise Server_notStarting(e)
@@ -87,10 +87,11 @@ def save():
 	Server_notRunning
 	"""
 	try:
-		if "unable to send cmd to a stopped server!" in str(subprocess.run(settings.Factorio_Launcher+" cmd /server-save",shell=True, check=True,stdout=subprocess.PIPE).stdout).lower():
+		if "unable to send cmd to a stopped server!" in str(subprocess.run(settings.Factorio_Launcher+" cmd /server-save", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
 			raise Server_notRunning("Kein Server gefunden")
 	except Exception as e:
 		raise Server_notRunning(e)
+
 
 def status():
 		"""throws
@@ -111,8 +112,3 @@ def status():
 						"\n"+ strReturn_Players.rstrip() +"```")
 		except Exception as e:
 			raise Server_notRunning(e)
-
-def getServer():
-	for proc in psutil.process_iter():
-		if proc.name() == "factorio":
-			return proc

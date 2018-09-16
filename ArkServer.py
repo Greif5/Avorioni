@@ -45,7 +45,7 @@ def stop():
 	Server_notStopping
 	"""
 	try:
-		if "the server is already stopped" in str(subprocess.run(settings.Ark_Launcher+" stop",shell=True, check=True,stdout=subprocess.PIPE).stdout).lower():
+		if "the server is already stopped" in str(subprocess.run(settings.Ark_Launcher+" stop", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
 			raise Server_notStopping("Kein Server gefunden")
 	except Exception as e:
 		raise Server_notStopping(e)
@@ -57,7 +57,7 @@ def start():
 	Server_notStarting
 	"""
 	try:
-		if "start aborted due to server already running" in str(subprocess.run(settings.Ark_Launcher+" start",shell=True, check=True,stdout=subprocess.PIPE).stdout).lower():
+		if "start aborted due to server already running" in str(subprocess.run(settings.Ark_Launcher+" start", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
 			raise Server_isRunning("Server läuft schon")
 	except Exception as e:
 		raise Server_notStarting(e)
@@ -77,6 +77,7 @@ def isStarted():
 	except Exception as e:
 		Server_notRunning(e)
 
+
 def isUsed():
 	"""throws
 	Server_notRunning
@@ -91,12 +92,13 @@ def isUsed():
 	except Exception as e:
 		Server_notRunning(e)
 
+
 def save():
 	"""throws
 	Server_notRunning
 	"""
 	try:
-		if "unable to send cmd to a stopped server!" in str(subprocess.run(settings.Ark_Launcher+" saveworld",shell=True, check=True,stdout=subprocess.PIPE).stdout).lower():
+		if "unable to send cmd to a stopped server!" in str(subprocess.run(settings.Ark_Launcher+" saveworld", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
 			raise Server_notRunning("Kein Server gefunden")
 	except Exception as e:
 		raise Server_notRunning(e)
@@ -107,7 +109,7 @@ def status():
 	Server_notRunning
 	"""
 	try:
-		strReturn =  subprocess.run(settings.Ark_Launcher+" status",shell=True, check=True,stdout=subprocess.PIPE).stdout.decode("UTF-8")
+		strReturn = subprocess.run(settings.Ark_Launcher+" status", shell=True, check=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
 		strReturn = strReturn.replace("[0;39m", "")
 		strReturn = strReturn.replace("[1;31m", "")
 		strReturn = strReturn.replace("[1;32m", "")
@@ -118,10 +120,6 @@ def status():
 	except Exception as e:
 		raise Server_notRunning(e)
 
-def getServer():
-	for proc in psutil.process_iter():
-		if proc.name() == "ark":
-			return proc
 
 # IDK-Funktion to remove weird ASCII-Escape chars
 noEscape = lambda s: "".join(i for i in s if not 27 == ord(i))

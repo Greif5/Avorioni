@@ -1,4 +1,4 @@
-from 	time 				import localtime, strftime, sleep
+from 	time 				import localtime, strftime
 from	discord.ext			import commands
 from	exceptionClasses	import *
 import	asyncio
@@ -30,8 +30,8 @@ if any(strElement in ("-c", "--clear") for strElement in sys.argv):
 	try:
 		os.remove(settings.LockFile)
 		print("Lockfile entfernt")
-	except Exception as e:
-		print("Lockfile konnte nicht entfernt werden" + str(e))
+	except Exception as ex:
+		print("Lockfile konnte nicht entfernt werden" + str(ex))
 	sys.exit()
 
 if os.path.isfile(settings.LockFile):
@@ -58,6 +58,7 @@ def is_admin():
 
 	return commands.check(invo)
 
+
 @bot.event
 async def on_ready():
 	print('Logged in as')
@@ -68,6 +69,7 @@ async def on_ready():
 
 	settings.bot_debug = bot.get_channel(settings.bot_debug_id)
 
+
 @is_admin()
 @bot.command()
 async def changename(ctx, *, name: str):
@@ -77,17 +79,7 @@ async def changename(ctx, *, name: str):
 	else:
 		return
 
-@bot.command()
-async def answer(ctx):
-	strAnswer = ""
-	if ctx.author.id in settings.list_Admins:
-		strAnswer = "Hello Master."
-	else:
-		strAnswer = "Hallo " + ctx.author.mention + " ich bin Avorioni."
 
-	await log(strAnswer)
-	await ctx.send(strAnswer)
-	
 @bot.command()
 async def backup(ctx, *args):
 	if args:
@@ -120,6 +112,7 @@ async def backup(ctx, *args):
 
 	await ctx.send("Bitte gib einen Server zum Sichern an.")
 	await ctx.send("```!backup Avorion|Factorio```")
+
 
 @bot.command()
 async def start(ctx, *args):
@@ -173,6 +166,7 @@ async def start(ctx, *args):
 	await ctx.send("Bitte gib einen Server zum Starten an.")
 	await ctx.send("```!start Ark|Avorion|Factorio```")
 
+
 @bot.command()
 async def stop(ctx, *args):
 	if args:
@@ -214,6 +208,7 @@ async def stop(ctx, *args):
 	await ctx.send("Bitte gib einen Server zum Stoppen an.")
 	await ctx.send("```!stop Ark|Avorion|Factorio```")
 
+
 @bot.command()
 async def save(ctx, *args):
 	if args:
@@ -229,7 +224,7 @@ async def save(ctx, *args):
 
 			elif arg.lower() in "avorion":
 				await ctx.send("ist Avorion")
-				#AvorionServer.save()
+				# AvorionServer.save()
 				return
 
 			elif arg.lower() in "factorio":
@@ -243,6 +238,7 @@ async def save(ctx, *args):
 
 	await ctx.send("Bitte gib einen Server zum Sichern an.")
 	await ctx.send("```!save Ark|Avorion|Factorio```")
+
 
 @bot.command()
 async def status(ctx, *args):
@@ -270,6 +266,7 @@ async def status(ctx, *args):
 
 	await ctx.send("Bitte gib einen Server zum Sichern an.")
 	await ctx.send("```!status Ark|Avorion|Factorio```")
+
 
 @is_admin()
 @bot.command()
