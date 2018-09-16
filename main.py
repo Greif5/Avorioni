@@ -87,6 +87,34 @@ async def answer(ctx):
 
 	await log(strAnswer)
 	await ctx.send(strAnswer)
+	
+@bot.command()
+async def backup(ctx, *args):
+	if args:
+		for arg in args:
+			if arg.lower() in "avorion":
+				if ctx.author.id in settings.list_Avorion:
+					await ctx.send("ist Avorion")
+				else:
+					await ctx.send("DU darfst den Server nicht befehlen")
+				return
+
+			elif arg.lower() in "factorio":
+				if ctx.author.id in settings.list_Factorio:
+					try:
+						FactorioServer.backup(1)
+						await ctx.send("FactorioServer wurde gesichert")
+					except Server_notStarting as e:
+						await ctx.send("FactorioServer konnte nicht gestartet werden")
+						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+					except Server_notStopping as e:
+						await ctx.send("FactorioServer konnte nicht gestoppt werden")
+				else:
+					await ctx.send("DU darfst den Server nicht befehlen")
+				return
+
+	await ctx.send("Bitte gib einen Server zum Starten an.")
+	await ctx.send("```!start Avorion|Factorio```")
 
 @bot.command()
 async def start(ctx, *args):
