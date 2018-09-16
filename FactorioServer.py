@@ -97,8 +97,18 @@ def status():
 		Server_notRunning
 		"""
 		try:
-			strReturn = subprocess.run(settings.Factorio_Launcher + " status", shell=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
-			return str("```" + strReturn + "```")
+			strReturn_Status	= subprocess.run(settings.Factorio_Launcher + " status", shell=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
+			if "Factorio is not running." in str(strReturn_Status):
+				return str("```" + strReturn_Status + "```")
+
+			strReturn_Players	= subprocess.run(settings.Factorio_Launcher + " players", shell=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
+			strReturn_PlayersOn = subprocess.run(settings.Factorio_Launcher + " players-online", shell=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
+
+			if strReturn_PlayersOn == "":
+				strReturn_PlayersOn = "0"
+			return str(	"```" + strReturn_Status +
+						"\nPlayers online: "+ strReturn_PlayersOn +
+						"\n"+ strReturn_Players +"```")
 		except Exception as e:
 			raise Server_notRunning(e)
 
