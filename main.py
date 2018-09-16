@@ -109,12 +109,13 @@ async def backup(ctx, *args):
 						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
 					except Server_notStopping as e:
 						await ctx.send("FactorioServer konnte nicht gestoppt werden")
+						await ctx.send("Der Fehler lautet:```" + str(e) + "```")
 				else:
 					await ctx.send("DU darfst den Server nicht befehlen")
 				return
 
-	await ctx.send("Bitte gib einen Server zum Starten an.")
-	await ctx.send("```!start Avorion|Factorio```")
+	await ctx.send("Bitte gib einen Server zum Sichern an.")
+	await ctx.send("```!backup Avorion|Factorio```")
 
 @bot.command()
 async def start(ctx, *args):
