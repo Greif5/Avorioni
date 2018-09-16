@@ -106,9 +106,9 @@ def status():
 
 			if strReturn_PlayersOn == "":
 				strReturn_PlayersOn = "0"
-			return str(	"```" + strReturn_Status +
-						"\nPlayers online: "+ strReturn_PlayersOn +
-						"\n"+ strReturn_Players +"```")
+			return str(	"```" + strReturn_Status.rstrip() +
+						"\nPlayers online: "+ strReturn_PlayersOn.rstrip() +
+						"\n"+ strReturn_Players.rstrip() +"```")
 		except Exception as e:
 			raise Server_notRunning(e)
 
