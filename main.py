@@ -196,7 +196,7 @@ async def stop(ctx, *args):
 				if ctx.author.id in settings.list_Avorion:
 					try:
 						AvorionServer.stop()
-					except Sever_notStopping as e:
+					except Server_notStopping as e:
 						await ctx.send("Der AvorionServer konnte nicht gestoppt werden")
 						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
 				else:
