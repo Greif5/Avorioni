@@ -145,6 +145,7 @@ async def start(ctx, *args):
 			elif arg.lower() in "avorion":
 				if ctx.author.id in settings.list_Avorion:
 					try:
+						await ctx.send("Der AvorionServer wird gestartet")
 						AvorionServer.start()
 					
 					except Server_notStarting as e:

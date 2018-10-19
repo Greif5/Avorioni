@@ -95,7 +95,9 @@ def start():
 	proc = getServer()
 	if not proc:
 		try:
+			print("Starting Avorion")
 			settings.AvorionServer = subprocess.Popen(settings.Avorion_Launcher, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+			print("Done")
 		except Exception as e:
 			raise Server_notStarting(e)
 	else:
