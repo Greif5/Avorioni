@@ -144,7 +144,14 @@ async def start(ctx, *args):
 
 			elif arg.lower() in "avorion":
 				if ctx.author.id in settings.list_Avorion:
-					await ctx.send("ist Avorion")
+					try:
+						AvorionServer.start()
+					
+					except Server_notStarting as e:
+						await ctx.send("Der AvorionServer konnte nicht gestartet werden")
+						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
+					except Server_isRunning as e:
+						await ctx.send("Der AvorionServer läuft bereits")
 				else:
 					await ctx.send("DU darfst den Server nicht befehlen")
 				return
@@ -186,7 +193,11 @@ async def stop(ctx, *args):
 
 			elif arg.lower() in "avorion":
 				if ctx.author.id in settings.list_Avorion:
-					await ctx.send("ist Avorion")
+					try:
+						AvorionServer.stop()
+					except Sever_notStopping as e:
+						await ctx.send("Der AvorionServer konnte nicht gestoppt werden")
+						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
 				else:
 					await ctx.send("DU darfst den Server nicht befehlen")
 
@@ -223,8 +234,11 @@ async def save(ctx, *args):
 				return
 
 			elif arg.lower() in "avorion":
-				await ctx.send("ist Avorion")
-				# AvorionServer.save()
+				try:
+					AvorionServer.save()
+				except RCON_error as e:
+					await ctx.send("Es gab einen Fehler!")
+					await ctx.send("Der Fehler lautet:```"+str(e)+"```")
 				return
 
 			elif arg.lower() in "factorio":

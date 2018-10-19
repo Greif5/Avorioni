@@ -26,11 +26,11 @@ def backup(intParam = 1):
 		# Time cheatsheet: http://strftime.org/
 		dtNow = datetime.datetime.now()
 		strNow = dtNow.strftime('%Y-%m-%d_%H-%M-%S')
-		strBak = settings.BackupPath + settings.BackupName + "_" + strNow + ".tgz"
+		strBak = settings.Avorion_BackupPath + settings.Avorion_BackupName + "_" + strNow + ".tgz"
 
 		# Run backup
 		with tarfile.open(strBak, "w:gz") as tar:
-			tar.add(settings.ServerPath, arcname=os.path.basename(settings.ServerPath))
+			tar.add(settings.Avorion_BackupPath, arcname=os.path.basename(settings.Avorion_BackupPath))
 
 		if intParam:
 			try:
@@ -71,23 +71,22 @@ def stop():
 			save()
 		except Server_notRunning():
 			return
+		
 		try:
-			strReturn = runRcon("/stop")
-		except RCON_error:
-			strReturn = "SOME ERROR"
-
-		if not strReturn:
-			try:
+			strReturn = settings.Avorion_Handler.communicate("/stop")[0]
+			print(strReturn)
+			
+			if not strReturn:
 				proc.kill()
-			except Exception as e:
-				raise Server_notStopping(e)
+				
+		except Exception as e:
+				raise Server_notStopping(e)		
 
 		time.sleep(1)
-		if psutil.pid_exists(proc.pid):
-			if psutil.Process(pid=proc.pid).name == proc.name():
-				raise Server_notStopping()
+		if getServer():
+			raise Server_notStopping()
 
-
+			
 def start():
 	"""throws
 	Server_isRunning
@@ -96,7 +95,7 @@ def start():
 	proc = getServer()
 	if not proc:
 		try:
-			"""start server"""
+			settings.AvorionServer = subprocess.Popen(settings.Avorion_Launcher, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 		except Exception as e:
 			raise Server_notStarting(e)
 	else:
@@ -113,7 +112,9 @@ def save():
 	proc = getServer()
 	if proc:
 		try:
-			strReturn = runRcon("/save")
+			# strReturn = runRcon("/save")
+			strReturn = settings.Avorion_Handler.communicate("/save")[0]
+			print(strReturn)
 		except Exception as e:
 			raise RCON_error(e)
 
@@ -138,7 +139,7 @@ def update():
 
 	try:
 		# Run Steam CMD with Params
-		subprocess.run(settings.steamCMD+" +login anonymous +force_install_dir "+settings.ServerPath+" +app_update 565060 validate")
+		subprocess.run(settings.steamCMD+" +login anonymous +force_install_dir "+settings.Avorion_Path+" +app_update 565060 validate")
 	except Exception as e:
 		raise Server_UpdateFailed(e)
 
