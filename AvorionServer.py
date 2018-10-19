@@ -115,7 +115,9 @@ def save():
 	if proc:
 		try:
 			# strReturn = runRcon("/save")
-			strReturn = settings.Avorion_Handler.communicate("/save")[0]
+			print("Sending")
+			byteReturn = settings.Avorion_Handler.communicate("/save".encode())[0]
+			strReturn = byteReturn.decode('utf-8')
 			print(strReturn)
 		except Exception as e:
 			raise RCON_error(e)
