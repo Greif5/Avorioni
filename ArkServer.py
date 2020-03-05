@@ -1,124 +1,146 @@
-import	datetime
-import	re
-import	settings
-import	subprocess
-from	exceptionClasses import *
+import datetime
+import re
+import tarfile
+import os
+import json
+import subprocess
+from exceptionClasses import *
 
 
-def backup(intParam=1):
-	"""throws
-	Server_notStarting
-	Server_notStopping
-	"""
+class ArkServer:
+	def __init__(self, jsonPath="settings.json"):
+		self.pathArk = "/path/to/ArkServer"
+		self.pathBackup = "/path/to/ArkBackup"
+		self.backupName = "Ark"
+		self.launcherName = "arkmanager"
 
-	"""Params
-	Restart Server Y/n
-	"""
+		self.readJson(filePath=jsonPath)
 
-	try:
-		# Stop the Server
-		stop()
-		# Create time and backupname
-		# Time cheatsheet: http://strftime.org/
-		dtNow = datetime.datetime.now()
-		strNow = dtNow.strftime('%Y-%m-%d_%H-%M-%S')
-		strBak = settings.Ark_BackupPath + settings.Ark_BackupName + "_" + strNow + ".tgz"
+	def readJson(self, filePath):
+		with open(filePath, "r") as file:
+			jsonHandle = json.load(file)
 
-		# Run backup
-		with tarfile.open(strBak, "w:gz") as tar:
-			tar.add(settings.Ark_Path, arcname=os.path.basename(settings.Ark_Path))
+			for key in jsonHandle.keys():
+				if key == "pathArk":
+					self.pathArk = jsonHandle[key]
+				elif key == "pathBackup":
+					self.pathBackup = jsonHandle[key]
+				elif key == "backupName":
+					self.backupName = jsonHandle[key]
+				elif key == "launcherName":
+					self.launcherName = jsonHandle[key]
 
-		if intParam:
-			try:
-				start()
-			except Server_isRunning:
-				pass
-			except Server_notStarting as e:
-				raise Server_notStarting(e)
+	def backup(self, intParam=1):
+		"""throws
+		Server_notStarting
+		Server_notStopping
+		"""
 
-	except Server_notStopping as e:
-		raise Server_notStopping(e)
+		"""Params
+		Restart Server Y/n
+		"""
 
+		try:
+			# Stop the Server
+			self.stop()
+			# Create time and backupname
+			# Time cheatsheet: http://strftime.org/
+			dtNow = datetime.datetime.now()
+			strNow = dtNow.strftime('%Y-%m-%d_%H-%M-%S')
+			strBak = self.pathBackup + self.backupName + "_" + strNow + ".tgz"
 
-def stop():
-	"""throws
-	Server_notStopping
-	"""
-	try:
-		if "the server is already stopped" in str(subprocess.run(settings.Ark_Launcher+" stop", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
-			raise Server_notStopping("Kein Server gefunden")
-	except Exception as e:
-		raise Server_notStopping(e)
+			# Run backup
+			with tarfile.open(strBak, "w:gz") as tar:
+				tar.add(self.pathArk, arcname=os.path.basename(self.pathArk))
 
+			if intParam:
+				try:
+					self.start()
+				except Server_isRunning:
+					pass
+				except Server_notStarting as e:
+					raise Server_notStarting(e)
 
-def start():
-	"""throws
-	Server_isRunning
-	Server_notStarting
-	"""
-	try:
-		if "start aborted due to server already running" in str(subprocess.run(settings.Ark_Launcher+" start", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
-			raise Server_isRunning("Server läuft schon")
-	except Exception as e:
-		raise Server_notStarting(e)
+		except Server_notStopping as e:
+			raise Server_notStopping(e)
 
+	def stop(self):
+		"""throws
+		Server_notStopping
+		"""
+		try:
+			if "the server is already stopped" in str(subprocess.run(self.launcherName + " stop", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
+				raise Server_notStopping("Kein Server gefunden")
+		except Exception as e:
+			raise Server_notStopping(e)
 
-def isStarted():
-	"""throws
-	Server_notRunning
-	"""
-	try:
-		strStatus = status()
+	def start(self):
+		"""throws
+		Server_isRunning
+		Server_notStarting
+		"""
+		try:
+			if "start aborted due to server already running" in str(
+					subprocess.run(self.launcherName + " start", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
+				raise Server_isRunning("Server läuft schon")
+		except Exception as e:
+			raise Server_notStarting(e)
 
-		if re.match("Server online:( )*Yes", strStatus):
-			return True
-		else:
-			return False
-	except Exception as e:
-		Server_notRunning(e)
+	def isStarted(self):
+		"""throws
+		Server_notRunning
+		"""
+		try:
+			strStatus = self.status()
 
+			if re.match("Server online:( )*Yes", strStatus):
+				return True
+			else:
+				return False
+		except Exception as e:
+			Server_notRunning(e)
 
-def isUsed():
-	"""throws
-	Server_notRunning
-	"""
-	try:
-		strStatus = status()
+	def isUsed(self):
+		"""throws
+		Server_notRunning
+		"""
+		try:
+			strStatus = self.status()
 
-		if re.match("Server online:( )*Yes", strStatus):
-			return True
-		else:
-			return False
-	except Exception as e:
-		Server_notRunning(e)
+			if re.match("Server online:( )*Yes", strStatus):
+				return True
+			else:
+				return False
+		except Exception as e:
+			Server_notRunning(e)
 
+	def save(self):
+		"""throws
+		Server_notRunning
+		"""
+		try:
+			if "unable to send cmd to a stopped server!" in str(
+					subprocess.run(self.launcherName + " saveworld", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
+				raise Server_notRunning("Kein Server gefunden")
+		except Exception as e:
+			raise Server_notRunning(e)
 
-def save():
-	"""throws
-	Server_notRunning
-	"""
-	try:
-		if "unable to send cmd to a stopped server!" in str(subprocess.run(settings.Ark_Launcher+" saveworld", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
-			raise Server_notRunning("Kein Server gefunden")
-	except Exception as e:
-		raise Server_notRunning(e)
-
-
-def status():
-	"""throws
-	Server_notRunning
-	"""
-	try:
-		strReturn = subprocess.run(settings.Ark_Launcher+" status", shell=True, check=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
-		strReturn = strReturn.replace("[0;39m", "")
-		strReturn = strReturn.replace("[1;31m", "")
-		strReturn = strReturn.replace("[1;32m", "")
-		strReturn = strReturn.replace(" Server",	"Server")
-		strReturn = strReturn.replace(" ARKServers",	"ARKServers")
-		strReturn = strReturn.replace(" Steam connect",	"Steam connect")
-		return str("```"+ noEscape(strReturn) +"```")
-	except Exception as e:
-		raise Server_notRunning(e)
+	def status(self):
+		"""throws
+		Server_notRunning
+		"""
+		try:
+			strReturn = ""
+			strReturn = subprocess.run(self.launcherName + " status", shell=True, check=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
+			strReturn = strReturn.replace("[0;39m", "")
+			strReturn = strReturn.replace("[1;31m", "")
+			strReturn = strReturn.replace("[1;32m", "")
+			strReturn = strReturn.replace(" Server", "Server")
+			strReturn = strReturn.replace(" ARKServers", "ARKServers")
+			strReturn = strReturn.replace(" Steam connect", "Steam connect")
+			return str("```" + noEscape(strReturn) + "```")
+		except Exception as e:
+			raise Server_notRunning(e)
 
 
 # IDK-Funktion to remove weird ASCII-Escape chars

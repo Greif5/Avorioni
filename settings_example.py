@@ -19,11 +19,6 @@ Avorion_BackupPath	= "/path/to/AvorionBackup"
 Avorion_BackupName	= "Avorion"
 Avorion_Launcher	= ""
 
-Ark_Path			= "/path/to/ArkServer"
-Ark_BackupPath		= "/path/to/ArkBackup"
-Ark_BackupName		= "Ark"
-Ark_Launcher		= "arkmanager"
-
 
 Factorio_Path		= "/path/to/FactorioServer"
 Factorio_BackupPath	= "/path/to/FactorioBackup"

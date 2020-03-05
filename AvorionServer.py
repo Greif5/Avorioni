@@ -69,7 +69,7 @@ class Avorion:
 
 		if self.cmdHandle:
 			try:
-				save()
+				self.save()
 			except Server_notRunning():
 				return
 
@@ -95,7 +95,12 @@ class Avorion:
 		if not self.cmdHandle:
 			try:
 				print("Starting Avorion")
-				self.cmdHandle = subprocess.Popen(settings.Avorion_Launcher, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+				self.cmdHandle = subprocess.Popen(
+					settings.Avorion_Launcher,
+					stdin=subprocess.PIPE,
+					stdout=subprocess.PIPE,
+					stderr=subprocess.PIPE,
+					shell=True)
 				print("Done")
 			except Exception as e:
 				raise Server_notStarting(e)
@@ -106,7 +111,6 @@ class Avorion:
 	def save(self):
 		"""throws
 		RCON_error
-
 		Sever_notRunning
 		"""
 		if self.cmdHandle:
@@ -119,10 +123,8 @@ class Avorion:
 				print("Done")
 			except Exception as e:
 				raise RCON_error(e)
-
-			return
-
-		raise Server_notRunning()
+		else:
+			raise Server_notRunning()
 
 
 	def update(self):
