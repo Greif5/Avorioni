@@ -24,3 +24,7 @@ class Server_UpdateFailed(Exception):
 
 class RCON_error(Exception):
 	pass
+
+
+class NoRights(Exception):
+	pass

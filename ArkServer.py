@@ -14,31 +14,65 @@ class ArkServer:
 		self.backupName = "Ark"
 		self.launcherName = "arkmanager"
 
-		self.readJson(filePath=jsonPath)
+		self.priviligedUser = []
+		self.adminList = []
 
-	def readJson(self, filePath):
-		with open(filePath, "r") as file:
-			jsonHandle = json.load(file)
+		self.jsonPath = jsonPath
 
-			for key in jsonHandle.keys():
-				if key == "pathArk":
-					self.pathArk = jsonHandle[key]
-				elif key == "pathBackup":
-					self.pathBackup = jsonHandle[key]
-				elif key == "backupName":
-					self.backupName = jsonHandle[key]
-				elif key == "launcherName":
-					self.launcherName = jsonHandle[key]
+		self.readJson()
 
-	def backup(self, intParam=1):
+	def readJson(self):
+		if os.path.exists(self.jsonPath):
+			with open(self.jsonPath, "r") as file:
+				jsonHandle = json.load(file)
+
+				for key in jsonHandle.keys():
+					if key == "pathArk":
+						self.pathArk = jsonHandle[key]
+					elif key == "pathBackup":
+						self.pathBackup = jsonHandle[key]
+					elif key == "backupName":
+						self.backupName = jsonHandle[key]
+					elif key == "launcherName":
+						self.launcherName = jsonHandle[key]
+					elif key == "user":
+						for user in jsonHandle[key]:
+							if user not in self.priviligedUser:
+								self.priviligedUser.append(user)
+					elif key == "admin":
+						for admin in jsonHandle[key]:
+							if admin not in self.adminList:
+								self.adminList.append(admin)
+
+	def saveJson(self):
+		saveDict = {
+			"pathArk": self.pathArk,
+			"pathBackup": self.pathBackup,
+			"backupName": self.backupName,
+			"launcherName": self.launcherName,
+			"user": [],
+			"admin": []
+		}
+
+		for user in self.priviligedUser:
+			saveDict["user"].append(user)
+
+		with open(f"{self.jsonPath}", "w") as f:
+			json.dump(saveDict, f, indent=4)
+
+	def backup(self, userId, intParam=1):
 		"""throws
 		Server_notStarting
 		Server_notStopping
+		NoRights
 		"""
 
 		"""Params
 		Restart Server Y/n
+		
 		"""
+		if userId not in self.adminList:
+			raise NoRights
 
 		try:
 			# Stop the Server
@@ -64,21 +98,27 @@ class ArkServer:
 		except Server_notStopping as e:
 			raise Server_notStopping(e)
 
-	def stop(self):
+	def stop(self, userId):
 		"""throws
 		Server_notStopping
+		NoRights
 		"""
+		if userId not in self.priviligedUser:
+			raise NoRights
 		try:
 			if "the server is already stopped" in str(subprocess.run(self.launcherName + " stop", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
 				raise Server_notStopping("Kein Server gefunden")
 		except Exception as e:
 			raise Server_notStopping(e)
 
-	def start(self):
+	def start(self, userId):
 		"""throws
 		Server_isRunning
 		Server_notStarting
+		NoRights
 		"""
+		if userId not in self.priviligedUser:
+			raise NoRights
 		try:
 			if "start aborted due to server already running" in str(
 					subprocess.run(self.launcherName + " start", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
@@ -114,10 +154,13 @@ class ArkServer:
 		except Exception as e:
 			Server_notRunning(e)
 
-	def save(self):
+	def save(self, userId):
 		"""throws
 		Server_notRunning
+		NoRights
 		"""
+		if userId not in self.priviligedUser:
+			raise NoRights
 		try:
 			if "unable to send cmd to a stopped server!" in str(
 					subprocess.run(self.launcherName + " saveworld", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
@@ -125,10 +168,13 @@ class ArkServer:
 		except Exception as e:
 			raise Server_notRunning(e)
 
-	def status(self):
+	def status(self, userId):
 		"""throws
 		Server_notRunning
+		NoRights
 		"""
+		if userId not in self.priviligedUser:
+			raise NoRights
 		try:
 			strReturn = ""
 			strReturn = subprocess.run(self.launcherName + " status", shell=True, check=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
@@ -142,6 +188,25 @@ class ArkServer:
 		except Exception as e:
 			raise Server_notRunning(e)
 
+	def userAdd(self, userId, newUser):
+		if userId in self.adminList:
+			self.priviligedUser.append(newUser)
+			self.saveJson()
+		else:
+			raise NoRights
+
+	def userRemove(self, userId, newUser):
+		if userId in self.adminList:
+			self.priviligedUser.remove(newUser)
+			self.saveJson()
+		else:
+			raise NoRights
+
 
 # IDK-Funktion to remove weird ASCII-Escape chars
 noEscape = lambda s: "".join(i for i in s if not 27 == ord(i))
+
+
+if __name__ == '__main__':
+	foo = ArkServer()
+	foo.saveJson()
