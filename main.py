@@ -4,7 +4,7 @@ from exceptionClasses import *
 import asyncio
 import atexit
 import discord
-import ArkServer
+from ArkServer import ArkServer
 import AvorionServer
 import FactorioServer
 import os
@@ -24,7 +24,8 @@ import settings
 def parseCallArguments():
 	if any(strElement in ("-c", "--clear") for strElement in sys.argv):
 		try:
-			os.remove(settings.LockFile)
+			if os.path.isfile(settings.LockFile):
+				os.remove(settings.LockFile)
 			print("Lockfile entfernt")
 		except Exception as ex:
 			print("Lockfile konnte nicht entfernt werden" + str(ex))
@@ -40,38 +41,104 @@ def parseCallArguments():
 
 
 # **************************************************************************************
+# Python only Funktions
+# **************************************************************************************
+def exit_Kontroll():
+	try:
+		os.remove(settings.LockFile)
+	except Exception as e:
+		print("Lockfile konnte nicht entfernt werden" + str(e))
+
+
+async def log(strLoggingText):
+	if any(strElement in ("-l", "--logging") for strElement in sys.argv):
+		strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
+		print(strLoggingText)
+		await settings.bot_debug.send(strLoggingText)
+
+
+if __name__ == '__main__':
+	parseCallArguments()
+	bot = commands.Bot(command_prefix="!", description="Gameserver Bot")
+	atexit.register(exit_Kontroll)
+
+
+# **************************************************************************************
 # Bot only Funktions
 # **************************************************************************************
+def is_admin():
+	def invo(ctx):
+		return ctx.author.id in settings.list_Admins
+
+	return commands.check(invo)
+
+
+@bot.event
+async def on_ready():
+	await avorioniHandler.on_ready()
+
+
+@bot.command()
+async def backup(ctx, *args):
+	await avorioniHandler.backup(ctx=ctx, *args)
+
+
+@bot.command()
+async def start(ctx, *args):
+	await avorioniHandler.start(ctx=ctx, *args)
+
+
+@bot.command()
+async def test(ctx, arg):
+	await ctx.send(arg)
+	await avorioniHandler.status(ctx, arg)
+
+
+@bot.command()
+async def stop(ctx, *args):
+	await avorioniHandler.stop(ctx=ctx, *args)
+
+
+@bot.command()
+async def save(ctx, *args):
+	await avorioniHandler.save(ctx=ctx, *args)
+
+
+@bot.command()
+async def status(ctx, args):
+	print(ctx)
+	print(args)
+	await avorioniHandler.status(ctx=ctx, *args)
+
+
+@is_admin()
+@bot.command()
+async def kill(ctx):
+	await avorioniHandler.kill(ctx=ctx)
+
+
+@is_admin()
+@bot.command()
+async def changename(self, ctx, *, name: str):
+	await bot.user.edit(username=name)
+	await ctx.send(ctx.author.mention + " - Changed name to: " + name)
+
+
 class Avorioni:
 	def __init__(self):
 		self.handleArk = ArkServer()
 
-	def is_admin(self):
-		def invo(ctx):
-			return ctx.author.id in settings.list_Admins
-
-		return commands.check(invo)
-
-	@bot.event
 	async def on_ready(self):
 		print('Logged in as')
 		print(bot.user.name)
 		print(bot.user.id)
 		print('------')
+		print("loaded Server:")
+		print(self.handleArk)
 		print(bot.guilds)
 
 		settings.bot_debug = bot.get_channel(settings.bot_debug_id)
 
-	@is_admin()
-	@bot.command()
-	async def changename(self, ctx, *, name: str):
-		if ctx.author.id in settings.list_Admins:
-			await bot.user.edit(username=name)
-			await ctx.send(ctx.author.mention + " - Changed name to: " + name)
-		else:
-			return
-
-	@bot.command()
 	async def backup(self, ctx, *args):
 		if args:
 			for arg in args:
@@ -104,7 +171,6 @@ class Avorioni:
 		await ctx.send("Bitte gib einen Server zum Sichern an.")
 		await ctx.send("```!backup Avorion|Factorio```")
 
-	@bot.command()
 	async def start(self, ctx, *args):
 		try:
 			if args:
@@ -129,7 +195,7 @@ class Avorioni:
 							except Server_notStarting as e:
 								await ctx.send("Der AvorionServer konnte nicht gestartet werden")
 								await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-							except Server_isRunning as e:
+							except Server_isRunning:
 								await ctx.send("Der AvorionServer läuft bereits")
 						else:
 							await ctx.send("DU darfst den Server nicht befehlen")
@@ -154,13 +220,12 @@ class Avorioni:
 		except Server_notStarting as e:
 			await ctx.send("Server konnte nicht gestartet werden")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")
-		except Server_isRunning as e:
+		except Server_isRunning:
 			await ctx.send("Server läuft bereits")
 		except NoRights:
 			await ctx.send("DU darfst den Server nicht befehlen")
 
-	@bot.command()
-	async def stop(self, ctx, *args):
+	async def stop(self, ctx, args):
 		try:
 			if args:
 				for arg in args:
@@ -197,13 +262,12 @@ class Avorioni:
 		except NoRights:
 			await ctx.send("DU darfst den Server nicht befehlen")
 
-	@bot.command()
-	async def save(self, ctx, *args):
+	async def save(self, ctx, args):
 		if args:
 			for arg in args:
 				if arg.lower() in "ark":
 					try:
-						self.handleArk.save()
+						self.handleArk.save(userId=ctx.author.id)
 						await ctx.send("ArkServer wurde gesichert")
 					except Server_notRunning as e:
 						await ctx.send("ArkServer konnte nicht gesichert werden")
@@ -230,59 +294,37 @@ class Avorioni:
 		await ctx.send("Bitte gib einen Server zum Sichern an.")
 		await ctx.send("```!save Ark|Avorion|Factorio```")
 
-	@bot.command()
-	async def status(self, ctx, *args):
-		if args:
-			for arg in args:
-				if arg.lower() in "ark":
-					try:
-						await ctx.send(self.handleArk.status())
-					except Server_notRunning as e:
-						await ctx.send("ArkServer läuft nicht")
-						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-					return
+	async def status(self, ctx, args):
+		try:
+			if args:
+				for arg in args:
+					if arg.lower() in "ark":
+						try:
+							await ctx.send(self.handleArk.status(userId=ctx.author.id))
+						except Server_notRunning as e:
+							await ctx.send("ArkServer läuft nicht")
+							await ctx.send("Der Fehler lautet:```" + str(e) + "```")
 
-				elif arg.lower() in "avorion":
-					await ctx.send("Avorion hat diese Funktion noch nicht")
-					return
+					elif arg.lower() in "avorion":
+						await ctx.send("Avorion hat diese Funktion noch nicht")
 
-				elif arg.lower() in "factorio":
-					try:
-						await ctx.send(FactorioServer.status())
-					except Server_notRunning as e:
-						await ctx.send("FactorioServer läuft nicht")
-						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-					return
+					elif arg.lower() in "factorio":
+						try:
+							await ctx.send(FactorioServer.status())
+						except Server_notRunning as e:
+							await ctx.send("FactorioServer läuft nicht")
+							await ctx.send("Der Fehler lautet:```" + str(e) + "```")
+			else:
+				await ctx.send("Bitte gib einen Server zum Sichern an.")
+				await ctx.send("```!status Ark|Avorion|Factorio```")
+		except NoRights:
+			await ctx.send("DU darfst den Server nicht befehlen")
 
-		await ctx.send("Bitte gib einen Server zum Sichern an.")
-		await ctx.send("```!status Ark|Avorion|Factorio```")
-
-	@is_admin()
-	@bot.command()
 	async def kill(self, ctx):
 		await ctx.send("Yes Master.")
 		await bot.close()
 
 
-# **************************************************************************************
-# Python only Funktions
-# **************************************************************************************
-def exit_Kontroll():
-	try:
-		os.remove(settings.LockFile)
-	except Exception as e:
-		print("Lockfile konnte nicht entfernt werden" + str(e))
-
-
-async def log(strLoggingText):
-	if any(strElement in ("-l", "--logging") for strElement in sys.argv):
-		strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
-		print(strLoggingText)
-		await settings.bot_debug.send(strLoggingText)
-
 if __name__ == '__main__':
-	parseCallArguments()
-
-	bot = commands.Bot(command_prefix="!", description="Gameserver Bot")
-	atexit.register(exit_Kontroll)
-	bot.run(settings.bot_id, loop="botloop")
+	avorioniHandler = Avorioni()
+	bot.run(settings.bot_id)

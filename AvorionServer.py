@@ -3,7 +3,7 @@ import	settings
 import	subprocess
 import	tarfile
 import	time
-import	valve.rcon
+import valve
 import	os.path
 import	psutil
 from exceptionClasses import *
@@ -25,7 +25,7 @@ class Avorion:
 
 		try:
 			# Stop the Server
-			stop()
+			self.stop()
 			# Create time and backupname
 			# Time cheatsheet: http://strftime.org/
 			dtNow = datetime.datetime.now()
@@ -38,14 +38,14 @@ class Avorion:
 
 			if intParam:
 				try:
-					start()
+					self.start()
 				except Server_isRunning:
 					pass
 				except Server_notStarting as e:
 					raise Server_notStarting(e)
 
 		except Server_notStopping as e:
-		raise Server_notStopping(e)
+			raise Server_notStopping(e)
 
 	def runRcon(self, strCommand):
 		"""throws
@@ -78,13 +78,13 @@ class Avorion:
 				print(strReturn)
 
 				if not strReturn:
-					proc.kill()
+					self.cmdHandle.kill()
 
 			except Exception as e:
 					raise Server_notStopping(e)
 
 			time.sleep(1)
-			if getServer():
+			if self.getServer():
 				raise Server_notStopping()
 
 	def start(self):
@@ -107,7 +107,6 @@ class Avorion:
 		else:
 			raise Server_isRunning()
 
-
 	def save(self):
 		"""throws
 		RCON_error
@@ -125,7 +124,6 @@ class Avorion:
 				raise RCON_error(e)
 		else:
 			raise Server_notRunning()
-
 
 	def update(self):
 		"""throws
