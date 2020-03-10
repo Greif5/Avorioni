@@ -3,15 +3,20 @@ from discord.ext import commands
 from exceptionClasses import *
 import asyncio
 import atexit
-import discord
+import json
 from ArkServer import ArkServer
-import AvorionServer
-# from AvorionServer import AvorionServer
+from AvorionServer import AvorionServer
 import FactorioServer
 # from FactorioServer import FactorioServer
 import os
 import sys
-import settings
+
+
+#  global Variables
+listAdmins = []
+botId = ""
+jsonPath ="settings.json"
+LockFile = "Avorioni.lock"
 
 
 # Parameter:
@@ -26,19 +31,19 @@ import settings
 def parseCallArguments():
 	if any(strElement in ("-c", "--clear") for strElement in sys.argv):
 		try:
-			if os.path.isfile(settings.LockFile):
-				os.remove(settings.LockFile)
+			if os.path.isfile(LockFile):
+				os.remove(LockFile)
 			print("Lockfile entfernt")
 		except Exception as ex:
 			print("Lockfile konnte nicht entfernt werden" + str(ex))
 		sys.exit()
 
-	if os.path.isfile(settings.LockFile):
+	if os.path.isfile(LockFile):
 		if not any(strElement in ("-f", "--force") for strElement in sys.argv):
 			print("Server läuft bereits.")
 			sys.exit()
 	else:
-		f = open(settings.LockFile, "w+")
+		f = open(LockFile, "w+")
 		f.close()
 
 
@@ -47,7 +52,7 @@ def parseCallArguments():
 # **************************************************************************************
 def exit_Kontroll():
 	try:
-		os.remove(settings.LockFile)
+		os.remove(LockFile)
 	except Exception as e:
 		print("Lockfile konnte nicht entfernt werden" + str(e))
 
@@ -56,11 +61,52 @@ async def log(strLoggingText):
 	if any(strElement in ("-l", "--logging") for strElement in sys.argv):
 		strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
 		print(strLoggingText)
-		await settings.bot_debug.send(strLoggingText)
+		# todo: what?
+		# await settings.bot_debug.send(strLoggingText)
+
+
+def jsonSave():
+	saveDict = {
+		"botId": botId,
+		"admin": []
+	}
+
+	for admin in listAdmins:
+		saveDict["admin"].append(admin)
+
+	with open(f"{jsonPath}", "w") as f:
+		json.dump(saveDict, f, indent=4)
+
+
+# load json settings
+def jsonLoad(path):
+	loadDict = {
+		"botId": "",
+		"admin": []
+	}
+
+	if os.path.exists(path):
+		with open(path, "r") as file:
+			jsonHandle = json.load(file)
+
+			for key in jsonHandle.keys():
+				if key == "botId":
+					loadDict["botId"] = jsonHandle[key]
+				elif key == "admin":
+					for admin in jsonHandle[key]:
+						if admin not in loadDict["admin"]:
+							loadDict["admin"].append(admin)
+	else:
+		print(f"Error: '{jsonPath}' does not exist")
+		jsonSave()
+
+	return loadDict["botId"], loadDict["admin"]
 
 
 if __name__ == '__main__':
 	parseCallArguments()
+	botId, listAdmins = jsonLoad(jsonPath)
+
 	bot = commands.Bot(command_prefix="!", description="Gameserver Bot")
 	atexit.register(exit_Kontroll)
 
@@ -70,7 +116,7 @@ if __name__ == '__main__':
 # **************************************************************************************
 def is_admin():
 	def invo(ctx):
-		return ctx.author.id in settings.list_Admins
+		return ctx.author.id in listAdmins
 
 	return commands.check(invo)
 
@@ -113,6 +159,12 @@ async def kill(ctx):
 
 @is_admin()
 @bot.command()
+async def jsonSave(ctx):
+	await jsonSave()
+
+
+@is_admin()
+@bot.command()
 async def changename(ctx, *, name: str):
 	await bot.user.edit(username=name)
 	await ctx.send(ctx.author.mention + " - Changed name to: " + name)
@@ -144,7 +196,7 @@ class Avorioni:
 			print(f"\t{serverHandle['longName']}")
 		print(bot.guilds)
 
-		settings.bot_debug = bot.get_channel(settings.bot_debug_id)
+		# settings.bot_debug = bot.get_channel(settings.bot_debug_id)
 
 	async def backup(self, ctx, *args):
 		# set a default for the excepts
@@ -296,4 +348,4 @@ class Avorioni:
 
 if __name__ == '__main__':
 	avorioniHandler = Avorioni()
-	bot.run(settings.bot_id)
+	bot.run(botId)
