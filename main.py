@@ -6,7 +6,9 @@ import atexit
 import discord
 from ArkServer import ArkServer
 import AvorionServer
+# from AvorionServer import AvorionServer
 import FactorioServer
+# from FactorioServer import FactorioServer
 import os
 import sys
 import settings
@@ -80,53 +82,57 @@ async def on_ready():
 
 @bot.command()
 async def backup(ctx, *args):
-	await avorioniHandler.backup(ctx=ctx, *args)
+	await avorioniHandler.backup(ctx, *args)
 
 
 @bot.command()
 async def start(ctx, *args):
-	await avorioniHandler.start(ctx=ctx, *args)
-
-
-@bot.command()
-async def test(ctx, arg):
-	await ctx.send(arg)
-	await avorioniHandler.status(ctx, arg)
+	await avorioniHandler.start(ctx, *args)
 
 
 @bot.command()
 async def stop(ctx, *args):
-	await avorioniHandler.stop(ctx=ctx, *args)
+	await avorioniHandler.stop(ctx, *args)
 
 
 @bot.command()
 async def save(ctx, *args):
-	await avorioniHandler.save(ctx=ctx, *args)
+	await avorioniHandler.save(ctx, *args)
 
 
 @bot.command()
-async def status(ctx, args):
-	print(ctx)
-	print(args)
-	await avorioniHandler.status(ctx=ctx, *args)
+async def status(ctx, *args):
+	await avorioniHandler.status(ctx, *args)
 
 
 @is_admin()
 @bot.command()
 async def kill(ctx):
-	await avorioniHandler.kill(ctx=ctx)
+	await avorioniHandler.kill(ctx)
 
 
 @is_admin()
 @bot.command()
-async def changename(self, ctx, *, name: str):
+async def changename(ctx, *, name: str):
 	await bot.user.edit(username=name)
 	await ctx.send(ctx.author.mention + " - Changed name to: " + name)
 
 
 class Avorioni:
 	def __init__(self):
-		self.handleArk = ArkServer()
+		self.serverMap = {
+			# "Avorion": {"serverHandler": ArkServer(), "longName": "ArkServer"},
+			"Ark": {"serverHandler": ArkServer(), "longName": "ArkServer"},
+			# "Factorio": {"serverHandler": FactorioServer(), "longName": "FactorioServer"}
+		}
+
+		# create a string of all allowed arguments
+		allowedArguments = ""
+		for allowedArg in self.serverMap.keys():
+			allowedArguments += allowedArg + "|"
+
+		# remove the last "|" for readability
+		self.allowedArguments = allowedArguments[:-1]
 
 	async def on_ready(self):
 		print('Logged in as')
@@ -134,191 +140,154 @@ class Avorioni:
 		print(bot.user.id)
 		print('------')
 		print("loaded Server:")
-		print(self.handleArk)
+		for serverHandle in self.serverMap.values():
+			print(f"\t{serverHandle['longName']}")
 		print(bot.guilds)
 
 		settings.bot_debug = bot.get_channel(settings.bot_debug_id)
 
 	async def backup(self, ctx, *args):
-		if args:
-			for arg in args:
-				if arg.lower() in "avorion":
-					if ctx.author.id in settings.list_Avorion:
-						await ctx.send("ist Avorion")
-					else:
-						await ctx.send("DU darfst den Server nicht befehlen")
-					return
+		# set a default for the excepts
+		serverLongName = "Server"
+		try:
+			if args:
+				# use local variables to make the code more readable
+				serverHandler = self.serverMap[args[0].lower()]["serverHandler"]
+				serverLongName = self.serverMap[args[0].lower()]['longName']
 
-				elif arg.lower() in "factorio":
-					if ctx.author.id in settings.list_Factorio:
-						try:
-							await ctx.send(	"FactorioServer wird gesichert\nDies kann einige Sekunden dauern.")
-							FactorioServer.backup(1)
-							await ctx.send("FactorioServer wurde gesichert")
-						except Server_notStarting as e:
-							await ctx.send("FactorioServer konnte nicht gestartet werden")
-							await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-						except Server_notStopping as e:
-							await ctx.send("FactorioServer konnte nicht gestoppt werden")
-							await ctx.send("Der Fehler lautet:```" + str(e) + "```")
-						except Server_BackupFailed as e:
-							await ctx.send("FactorioServer konnte nicht gesichert werden")
-							await ctx.send("Bitte schau im Log nach dem Fehler.")
-					else:
-						await ctx.send("DU darfst den Server nicht befehlen")
-					return
-
-		await ctx.send("Bitte gib einen Server zum Sichern an.")
-		await ctx.send("```!backup Avorion|Factorio```")
+				# send the backup command
+				# todo: not implemented in avorion
+				await ctx.send(f"{serverLongName} wird gesichert\nDies kann einige Sekunden dauern.")
+				serverHandler.backup(userId=ctx.author.id, intParam=1)
+				await ctx.send(f"{serverLongName} wurde gesichert")
+			else:
+				raise KeyError
+		except Server_notStopping as e:
+			await ctx.send(f"{serverLongName} konnte nicht gestoppt werden")
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
+		except Server_BackupFailed as e:
+			await ctx.send(f"{serverLongName} konnte nicht gesichert werden")
+			await ctx.send("Bitte schau im Log nach dem Fehler.")
+		except KeyError:
+			await ctx.send("Bitte gib einen Server zum Sichern an.")
+			await ctx.send(f"```!backup {self.allowedArguments}```")
+		except Exception as e:
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
 
 	async def start(self, ctx, *args):
+		# set a default for the excepts
+		serverLongName = "Server"
 		try:
 			if args:
-				for arg in args:
-					if arg.lower() in "ark":
-						self.handleArk.start(userId=ctx.author.id)
-						await ctx.send("ArkServer wird gestartet")
+				# use local variables to make the code more readable
+				serverHandler = self.serverMap[args[0].lower()]["serverHandler"]
+				serverLongName = self.serverMap[args[0].lower()]['longName']
 
-						for i in range(42):
-							print(self.handleArk.isStarted())
-							if self.handleArk.isStarted():
-								await ctx.send("ArkServer ist gestartet")
-								return
-							await asyncio.sleep(10)
-						await ctx.send("Der ArkServer braucht unerwartet lange zum starten")
-					elif arg.lower() in "avorion":
-						if ctx.author.id in settings.list_Avorion:
-							try:
-								await ctx.send("Der AvorionServer wird gestartet")
-								AvorionServer.start()
+				# send the start command
+				serverHandler.start(userId=ctx.author.id)
+				await ctx.send(f"{serverLongName} wird gestartet")
 
-							except Server_notStarting as e:
-								await ctx.send("Der AvorionServer konnte nicht gestartet werden")
-								await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-							except Server_isRunning:
-								await ctx.send("Der AvorionServer läuft bereits")
-						else:
-							await ctx.send("DU darfst den Server nicht befehlen")
+				# wait 420 seconds for the server to be started
+				for i in range(42):
+					# print and return successfully
+					if serverHandler.isStarted():
+						await ctx.send(f"{serverLongName} ist gestartet")
 						return
-
-					elif arg.lower() in "factorio":
-						if ctx.author.id in settings.list_Factorio:
-							try:
-								FactorioServer.start()
-								await ctx.send("FactorioServer ist gestartet")
-							except Server_notStarting as e:
-								await ctx.send("FactorioServer konnte nicht gestartet werden")
-								await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-							except Server_isRunning as e:
-								await ctx.send("FactorioServer läuft bereits")
-						else:
-							await ctx.send("DU darfst den Server nicht befehlen")
-						return
+					await asyncio.sleep(10)
+				# notify about the timeout
+				await ctx.send(f"Der {serverLongName} braucht unerwartet lange zum starten")
 			else:
-				await ctx.send("Bitte gib einen Server zum Starten an.")
-				await ctx.send("```!start Ark|Avorion|Factorio```")
+				raise KeyError
 		except Server_notStarting as e:
-			await ctx.send("Server konnte nicht gestartet werden")
-			await ctx.send("Der Fehler lautet:```" + str(e) + "```")
+			await ctx.send(f"{serverLongName} konnte nicht gestartet werden")
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
 		except Server_isRunning:
-			await ctx.send("Server läuft bereits")
+			await ctx.send(f"{serverLongName} läuft bereits")
 		except NoRights:
 			await ctx.send("DU darfst den Server nicht befehlen")
+		except KeyError:
+			await ctx.send("Bitte gib einen Server zum Starten an.")
+			await ctx.send(f"```!start {self.allowedArguments}```")
+		except Exception as e:
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
 
-	async def stop(self, ctx, args):
+	async def stop(self, ctx, *args):
+		# set a default for the excepts
+		serverLongName = "Server"
 		try:
 			if args:
-				for arg in args:
-					if arg.lower() in "ark":
-						self.handleArk.stop(userId=ctx.author.id)
-						await ctx.send("ArkServer ist gestoppt")
-						return
+				# use local variables to make the code more readable
+				serverHandler = self.serverMap[args[0].lower()]["serverHandler"]
+				serverLongName = self.serverMap[args[0].lower()]['longName']
 
-					elif arg.lower() in "avorion":
-						if ctx.author.id in settings.list_Avorion:
-							try:
-								AvorionServer.stop()
-							except Server_notStopping as e:
-								await ctx.send("Der AvorionServer konnte nicht gestoppt werden")
-								await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-						else:
-							await ctx.send("DU darfst den Server nicht befehlen")
-
-						return
-
-					elif arg.lower() in "factorio":
-						if ctx.author.id in settings.list_Factorio:
-							FactorioServer.stop()
-							await ctx.send("FactorioServer ist gestoppt")
-						else:
-							await ctx.send("DU darfst den Server nicht befehlen")
-						return
+				# send the stop command
+				serverHandler.stop(userId=ctx.author.id)
+				await ctx.send(f"{serverLongName} ist gestoppt")
 			else:
-				await ctx.send("Bitte gib einen Server zum Stoppen an.")
-				await ctx.send("```!stop Ark|Avorion|Factorio```")
+				raise KeyError
 		except Server_notStopping as e:
-			await ctx.send("Server konnte nicht gestoppt werden")
+			await ctx.send(f"{serverLongName} konnte nicht gestoppt werden")
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
+		except NoRights:
+			await ctx.send("DU darfst den Server nicht befehlen")
+		except KeyError:
+			await ctx.send("Bitte gib einen Server zum Stoppen an.")
+			await ctx.send(f"```!stop {self.allowedArguments}```")
+		except Exception as e:
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
+
+	async def save(self, ctx, *args):
+		# set a default for the excepts
+		serverLongName = "Server"
+		try:
+			if args:
+				# use local variables to make the code more readable
+				serverHandler = self.serverMap[args[0].lower()]["serverHandler"]
+				serverLongName = self.serverMap[args[0].lower()]['longName']
+
+				# send the save command
+				serverHandler.save(userId=ctx.author.id)
+				await ctx.send(f"{serverLongName} wurde gesichert")
+			else:
+				raise KeyError
+		except Server_notRunning as e:
+			await ctx.send(f"{serverLongName} nicht gesichert werden")
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
+		except RCON_error as e:
+			await ctx.send("Es gab einen Fehler!")
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
+		except NoRights:
+			await ctx.send("DU darfst den Server nicht befehlen")
+		except KeyError:
+			await ctx.send("Bitte gib einen Server zum Sichern an.")
+			await ctx.send(f"```!save {self.allowedArguments}```")
+		except Exception as e:
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
+
+	async def status(self, ctx, *args):
+		# set a default for the excepts
+		serverLongName = "Server"
+		try:
+			if args:
+				# use local variables to make the code more readable
+				serverHandler = self.serverMap[args[0].lower()]["serverHandler"]
+				serverLongName = self.serverMap[args[0].lower()]['longName']
+
+				# send the status command and print it's return
+				await ctx.send(f"{serverHandler.status(userId=ctx.author.id)}")
+				# todo Avorion hat diese Funktion noch nicht"
+			else:
+				raise KeyError
+		except Server_notRunning as e:
+			await ctx.send(f"{serverLongName} läuft nicht")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")
 		except NoRights:
 			await ctx.send("DU darfst den Server nicht befehlen")
-
-	async def save(self, ctx, args):
-		if args:
-			for arg in args:
-				if arg.lower() in "ark":
-					try:
-						self.handleArk.save(userId=ctx.author.id)
-						await ctx.send("ArkServer wurde gesichert")
-					except Server_notRunning as e:
-						await ctx.send("ArkServer konnte nicht gesichert werden")
-						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-					return
-
-				elif arg.lower() in "avorion":
-					try:
-						AvorionServer.save()
-					except RCON_error as e:
-						await ctx.send("Es gab einen Fehler!")
-						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-					return
-
-				elif arg.lower() in "factorio":
-					try:
-						FactorioServer.save()
-						await ctx.send("FactorioServer wurde gesichert")
-					except Server_notRunning as e:
-						await ctx.send("FactorioServer konnte nicht gesichert werden")
-						await ctx.send("Der Fehler lautet:```"+str(e)+"```")
-					return
-
-		await ctx.send("Bitte gib einen Server zum Sichern an.")
-		await ctx.send("```!save Ark|Avorion|Factorio```")
-
-	async def status(self, ctx, args):
-		try:
-			if args:
-				for arg in args:
-					if arg.lower() in "ark":
-						try:
-							await ctx.send(self.handleArk.status(userId=ctx.author.id))
-						except Server_notRunning as e:
-							await ctx.send("ArkServer läuft nicht")
-							await ctx.send("Der Fehler lautet:```" + str(e) + "```")
-
-					elif arg.lower() in "avorion":
-						await ctx.send("Avorion hat diese Funktion noch nicht")
-
-					elif arg.lower() in "factorio":
-						try:
-							await ctx.send(FactorioServer.status())
-						except Server_notRunning as e:
-							await ctx.send("FactorioServer läuft nicht")
-							await ctx.send("Der Fehler lautet:```" + str(e) + "```")
-			else:
-				await ctx.send("Bitte gib einen Server zum Sichern an.")
-				await ctx.send("```!status Ark|Avorion|Factorio```")
-		except NoRights:
-			await ctx.send("DU darfst den Server nicht befehlen")
+		except KeyError:
+			await ctx.send("Bitte gib einen Server zum Sichern an.")
+			await ctx.send(f"```!status {self.allowedArguments}```")
+		except Exception as e:
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
 
 	async def kill(self, ctx):
 		await ctx.send("Yes Master.")
