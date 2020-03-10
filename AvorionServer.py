@@ -9,7 +9,7 @@ import	psutil
 from exceptionClasses import *
 
 
-class Avorion:
+class AvorionServer:
 	def __init__(self):
 		self.cmdHandle = None
 
