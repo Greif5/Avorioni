@@ -9,7 +9,7 @@ from exceptionClasses import *
 
 class ArkServer:
 	def __init__(self, jsonPath="settings.json"):
-		self.pathArk = "/path/to/ArkServer"
+		self.path = "/path/to/ArkServer"
 		self.pathBackup = "/path/to/ArkBackup"
 		self.backupName = "Ark"
 		self.launcherName = "arkmanager"
@@ -18,6 +18,7 @@ class ArkServer:
 		self.adminList = []
 
 		self.jsonPath = jsonPath
+		self.jsonKey = "Ark"
 
 		self.readJson()
 
@@ -27,26 +28,29 @@ class ArkServer:
 				jsonHandle = json.load(file)
 
 				for key in jsonHandle.keys():
-					if key == "pathArk":
-						self.pathArk = jsonHandle[key]
-					elif key == "pathBackup":
-						self.pathBackup = jsonHandle[key]
-					elif key == "backupName":
-						self.backupName = jsonHandle[key]
-					elif key == "launcherName":
-						self.launcherName = jsonHandle[key]
-					elif key == "user":
-						for user in jsonHandle[key]:
-							if user not in self.priviligedUser:
-								self.priviligedUser.append(user)
-					elif key == "admin":
-						for admin in jsonHandle[key]:
-							if admin not in self.adminList:
-								self.adminList.append(admin)
+					if key == self.jsonKey:
+						subHandle = jsonHandle[key]
+						for subKey in subHandle:
+							if subKey == "path":
+								self.path = subHandle[subKey]
+							elif subKey == "pathBackup":
+								self.pathBackup = subHandle[subKey]
+							elif subKey == "backupName":
+								self.backupName = subHandle[subKey]
+							elif subKey == "launcherName":
+								self.launcherName = subHandle[subKey]
+							elif subKey == "user":
+								for user in subHandle[subKey]:
+									if user not in self.priviligedUser:
+										self.priviligedUser.append(user)
+							elif subKey == "admin":
+								for admin in subHandle[subKey]:
+									if admin not in self.adminList:
+										self.adminList.append(admin)
 
 	def saveJson(self):
 		saveDict = {
-			"pathArk": self.pathArk,
+			"path": self.path,
 			"pathBackup": self.pathBackup,
 			"backupName": self.backupName,
 			"launcherName": self.launcherName,
@@ -58,7 +62,7 @@ class ArkServer:
 			saveDict["user"].append(user)
 
 		with open(f"{self.jsonPath}", "w") as f:
-			json.dump(saveDict, f, indent=4)
+			json.dump({self.jsonKey: saveDict}, f, indent=4)
 
 	def backup(self, userId, intParam=1):
 		"""throws
@@ -76,7 +80,7 @@ class ArkServer:
 
 		try:
 			# Stop the Server
-			self.stop()
+			self.stop(userId=userId)
 			# Create time and backupname
 			# Time cheatsheet: http://strftime.org/
 			dtNow = datetime.datetime.now()
@@ -89,7 +93,7 @@ class ArkServer:
 
 			if intParam:
 				try:
-					self.start()
+					self.start(userId=userId)
 				except Server_isRunning:
 					pass
 				except Server_notStarting as e:
@@ -126,12 +130,12 @@ class ArkServer:
 		except Exception as e:
 			raise Server_notStarting(e)
 
-	def isStarted(self):
+	def isStarted(self, userId):
 		"""throws
 		Server_notRunning
 		"""
 		try:
-			strStatus = self.status()
+			strStatus = self.status(userId=userId)
 
 			if re.match("Server online:( )*Yes", strStatus):
 				return True
@@ -140,12 +144,12 @@ class ArkServer:
 		except Exception as e:
 			Server_notRunning(e)
 
-	def isUsed(self):
+	def isUsed(self, userId):
 		"""throws
 		Server_notRunning
 		"""
 		try:
-			strStatus = self.status()
+			strStatus = self.status(userId=userId)
 
 			if re.match("Server online:( )*Yes", strStatus):
 				return True
@@ -176,7 +180,6 @@ class ArkServer:
 		if userId not in self.priviligedUser:
 			raise NoRights
 		try:
-			strReturn = ""
 			strReturn = subprocess.run(self.launcherName + " status", shell=True, check=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
 			strReturn = strReturn.replace("[0;39m", "")
 			strReturn = strReturn.replace("[1;31m", "")
@@ -205,7 +208,6 @@ class ArkServer:
 
 # IDK-Funktion to remove weird ASCII-Escape chars
 noEscape = lambda s: "".join(i for i in s if not 27 == ord(i))
-
 
 if __name__ == '__main__':
 	foo = ArkServer()

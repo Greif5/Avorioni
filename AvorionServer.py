@@ -1,44 +1,119 @@
-import	datetime
-import	settings
-import	subprocess
-import	tarfile
-import	time
+import datetime
+import json
+import os
+import psutil
+import subprocess
+import tarfile
+import time
 import valve
-import	os.path
-import	psutil
 from exceptionClasses import *
 
 
 class AvorionServer:
-	def __init__(self):
+	def __init__(self, jsonPath="settings.json"):
+		self.path = "/path/to/AvorionServer"
+		self.pathBackup = "/path/to/AvorionBackup"
+		self.backupName = "Avorion"
+		self.launcherName = ""
 		self.cmdHandle = None
+		self.steamCMD = "/path/to/steamCMD"
 
-	def backup(self, intParam=1):
+		self.priviligedUser = []
+		self.adminList = []
+		self.rconSettings = {
+			"address": "127.0.0.1",
+			"port": "PORT",
+			"pw": "PASSOWRD"
+		}
+
+		self.jsonPath = jsonPath
+		self.jsonKey = "Avorion"
+
+		self.readJson()
+
+	def readJson(self):
+		if os.path.exists(self.jsonPath):
+			with open(self.jsonPath, "r") as file:
+				jsonHandle = json.load(file)
+
+				for key in jsonHandle.keys():
+					if key == self.jsonKey:
+						subHandle = jsonHandle[key]
+						for subKey in subHandle:
+							if subKey == "path":
+								self.path = subHandle[subKey]
+							elif subKey == "pathBackup":
+								self.pathBackup = subHandle[subKey]
+							elif subKey == "backupName":
+								self.backupName = subHandle[subKey]
+							elif subKey == "launcherName":
+								self.launcherName = subHandle[subKey]
+							elif subKey == "steamCMD":
+								self.steamCMD = subHandle[subKey]
+							elif subKey == "user":
+								for user in subHandle[subKey]:
+									if user not in self.priviligedUser:
+										self.priviligedUser.append(user)
+							elif subKey == "admin":
+								for admin in subHandle[subKey]:
+									if admin not in self.adminList:
+										self.adminList.append(admin)
+							elif subKey == "rconSettings":
+								try:
+									for rconKey in subHandle[subKey]:
+										self.rconSettings[rconKey] = subHandle[subKey][rconKey]
+								except KeyError:
+									print(f"Error: key '{rconKey}' not found")  # todo: put in logs only
+
+	def saveJson(self):
+		saveDict = {
+			"path": self.path,
+			"pathBackup": self.pathBackup,
+			"backupName": self.backupName,
+			"launcherName": self.launcherName,
+			"steamCMD": self.steamCMD,
+			"user": [],
+			"admin": [],
+			"rconSettings": self.rconSettings
+		}
+
+		for user in self.priviligedUser:
+			saveDict["user"].append(user)
+
+		with open(f"{self.jsonPath}", "w") as f:
+			json.dump({self.jsonKey: saveDict}, f, indent=4)
+
+	def backup(self, userId, intParam=1):
 		"""throws
 		Server_notStarting
 		Server_notStopping
+		NoRights
+		NotImplemented
 		"""
 
 		"""Params
 		Restart Server Y/n
 		"""
-
+		if userId not in self.adminList:
+			raise NoRights
+		# todo Implement
+		raise NotImplemented
 		try:
 			# Stop the Server
-			self.stop()
+			self.stop(userId=userId)
 			# Create time and backupname
 			# Time cheatsheet: http://strftime.org/
 			dtNow = datetime.datetime.now()
 			strNow = dtNow.strftime('%Y-%m-%d_%H-%M-%S')
-			strBak = settings.Avorion_BackupPath + settings.Avorion_BackupName + "_" + strNow + ".tgz"
+			strBak = self.pathBackup + self.backupName + "_" + strNow + ".tgz"
 
 			# Run backup
 			with tarfile.open(strBak, "w:gz") as tar:
-				tar.add(settings.Avorion_BackupPath, arcname=os.path.basename(settings.Avorion_BackupPath))
+				tar.add(self.pathBackup, arcname=os.path.basename(self.pathBackup))
 
 			if intParam:
 				try:
-					self.start()
+					self.start(userId=userId)
 				except Server_isRunning:
 					pass
 				except Server_notStarting as e:
@@ -47,56 +122,72 @@ class AvorionServer:
 		except Server_notStopping as e:
 			raise Server_notStopping(e)
 
-	def runRcon(self, strCommand):
+	def runRcon(self, userId, strCommand):
 		"""throws
 		RCON_error
+		NoRights
+		NotImplemented
 		"""
 
 		"""returns
 		string
 		"""
+		if userId not in self.adminList:
+			raise NoRights
+		raise NotImplemented
+
 		try:
-			strReturn = valve.rcon.execute(settings.address+":"+settings.port, settings.pw, strCommand)
+			strReturn = valve.rcon.execute(
+				f"{self.rconSettings['address']}:{self.rconSettings['port']}",
+				self.rconSettings["pw"],
+				strCommand)
 		except Exception as e:
 			raise RCON_error(e)
 
 		return strReturn
 
-	def stop(self):
+	def stop(self, userId):
 		"""throws
 		Sever_notStopping
+		NoRights
+		NotImplemented
 		"""
+		if userId not in self.adminList:
+			raise NoRights
+		raise NotImplemented
 
 		if self.cmdHandle:
 			try:
-				self.save()
+				self.save(userId=userId)
 			except Server_notRunning():
 				return
 
 			try:
-				strReturn = settings.Avorion_Handler.communicate("/stop")[0]
+				strReturn = self.cmdHandle.communicate("/stop")[0]
 				print(strReturn)
 
 				if not strReturn:
 					self.cmdHandle.kill()
 
 			except Exception as e:
-					raise Server_notStopping(e)
+				raise Server_notStopping(e)
 
-			time.sleep(1)
-			if self.getServer():
-				raise Server_notStopping()
-
-	def start(self):
+	def start(self, userId):
 		"""throws
 		Server_isRunning
 		Server_notStarting
+		NoRights
+		NotImplemented
 		"""
+		if userId not in self.adminList:
+			raise NoRights
+		raise NotImplemented
+
 		if not self.cmdHandle:
 			try:
 				print("Starting Avorion")
 				self.cmdHandle = subprocess.Popen(
-					settings.Avorion_Launcher,
+					self.launcherName,
 					stdin=subprocess.PIPE,
 					stdout=subprocess.PIPE,
 					stderr=subprocess.PIPE,
@@ -107,16 +198,22 @@ class AvorionServer:
 		else:
 			raise Server_isRunning()
 
-	def save(self):
+	def save(self, userId):
 		"""throws
 		RCON_error
 		Sever_notRunning
+		NoRights
+		NotImplemented
 		"""
+		if userId not in self.adminList:
+			raise NoRights
+		raise NotImplemented
+
 		if self.cmdHandle:
 			try:
 				# strReturn = runRcon("/save")
 				print("Sending")
-				byteReturn = self.cmdHandle.communicate("/save".encode(),20)[0]
+				byteReturn = self.cmdHandle.communicate("/save".encode(), 20)[0]
 				strReturn = byteReturn.decode('utf-8')
 				print(strReturn)
 				print("Done")
@@ -125,12 +222,26 @@ class AvorionServer:
 		else:
 			raise Server_notRunning()
 
-	def update(self):
+	def status(self, userId):
+		"""throws
+		NoRights
+		NotImplemented
+		"""
+		if userId not in self.adminList:
+			raise NoRights
+		raise NotImplemented
+
+	def update(self, userId):
 		"""throws
 		Server_notStarting
 		Server_notStopping
 		Server_UpdateFailed
+		NoRights
+		NotImplemented
 		"""
+		if userId not in self.adminList:
+			raise NoRights
+		raise NotImplemented
 
 		try:
 			self.backup(0)
@@ -141,6 +252,21 @@ class AvorionServer:
 
 		try:
 			# Run Steam CMD with Params
-			subprocess.run(settings.steamCMD+" +login anonymous +force_install_dir "+settings.Avorion_Path+" +app_update 565060 validate")
+			subprocess.run(
+				f"{self.steamCMD} +login anonymous +force_install_dir {self.path} +app_update 565060 validate")
 		except Exception as e:
 			raise Server_UpdateFailed(e)
+
+	def userAdd(self, userId, newUser):
+		if userId in self.adminList:
+			self.priviligedUser.append(newUser)
+			self.saveJson()
+		else:
+			raise NoRights
+
+	def userRemove(self, userId, newUser):
+		if userId in self.adminList:
+			self.priviligedUser.remove(newUser)
+			self.saveJson()
+		else:
+			raise NoRights

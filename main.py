@@ -6,8 +6,7 @@ import atexit
 import json
 from ArkServer import ArkServer
 from AvorionServer import AvorionServer
-import FactorioServer
-# from FactorioServer import FactorioServer
+from FactorioServer import FactorioServer
 import os
 import sys
 
@@ -175,7 +174,7 @@ class Avorioni:
 		self.serverMap = {
 			# "Avorion": {"serverHandler": ArkServer(), "longName": "ArkServer"},
 			"Ark": {"serverHandler": ArkServer(), "longName": "ArkServer"},
-			# "Factorio": {"serverHandler": FactorioServer(), "longName": "FactorioServer"}
+			"Factorio": {"serverHandler": FactorioServer(), "longName": "FactorioServer"}
 		}
 
 		# create a string of all allowed arguments

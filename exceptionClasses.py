@@ -28,3 +28,7 @@ class RCON_error(Exception):
 
 class NoRights(Exception):
 	pass
+
+
+class NotImplemented(Exception):
+	pass
