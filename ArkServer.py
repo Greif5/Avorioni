@@ -49,6 +49,10 @@ class ArkServer:
 										self.adminList.append(admin)
 
 	def saveJson(self):
+		oldJson = None
+		with open(self.jsonPath, "r") as file:
+			oldJson = json.load(file)
+
 		saveDict = {
 			"path": self.path,
 			"pathBackup": self.pathBackup,
@@ -61,8 +65,10 @@ class ArkServer:
 		for user in self.priviligedUser:
 			saveDict["user"].append(user)
 
+		oldJson[self.jsonKey] = saveDict
+
 		with open(f"{self.jsonPath}", "w") as f:
-			json.dump({self.jsonKey: saveDict}, f, indent=4)
+			json.dump(oldJson, f, indent=4)
 
 	def backup(self, userId, intParam=1):
 		"""throws
