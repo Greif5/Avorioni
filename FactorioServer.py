@@ -200,3 +200,26 @@ class FactorioServer:
 				"\n" + strReturn_Players.rstrip() + "```")
 		except Exception as e:
 			raise Server_notRunning(e)
+
+	def update(self, userId):
+		"""throws
+		Server_notStopping
+		NoRights
+		"""
+		if userId not in self.adminList:
+			raise NoRights
+		raise NotImplemented
+
+	def userAdd(self, userId, newUser):
+		if userId in self.adminList:
+			self.priviligedUser.append(newUser)
+			self.saveJson()
+		else:
+			raise NoRights
+
+	def userRemove(self, userId, newUser):
+		if userId in self.adminList:
+			self.priviligedUser.remove(newUser)
+			self.saveJson()
+		else:
+			raise NoRights

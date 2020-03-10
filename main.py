@@ -150,6 +150,11 @@ async def status(ctx, *args):
 	await avorioniHandler.status(ctx, *args)
 
 
+@bot.command()
+async def update(ctx, *args):
+	await avorioniHandler.update(ctx, *args)
+
+
 @is_admin()
 @bot.command()
 async def kill(ctx):
@@ -213,6 +218,8 @@ class Avorioni:
 				await ctx.send(f"{serverLongName} wurde gesichert")
 			else:
 				raise KeyError
+		except NotImplemented:
+			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notStopping as e:
 			await ctx.send(f"{serverLongName} konnte nicht gestoppt werden")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
@@ -249,6 +256,8 @@ class Avorioni:
 				await ctx.send(f"Der {serverLongName} braucht unerwartet lange zum starten")
 			else:
 				raise KeyError
+		except NotImplemented:
+			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notStarting as e:
 			await ctx.send(f"{serverLongName} konnte nicht gestartet werden")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
@@ -276,6 +285,8 @@ class Avorioni:
 				await ctx.send(f"{serverLongName} ist gestoppt")
 			else:
 				raise KeyError
+		except NotImplemented:
+			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notStopping as e:
 			await ctx.send(f"{serverLongName} konnte nicht gestoppt werden")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
@@ -301,6 +312,8 @@ class Avorioni:
 				await ctx.send(f"{serverLongName} wurde gesichert")
 			else:
 				raise KeyError
+		except NotImplemented:
+			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notRunning as e:
 			await ctx.send(f"{serverLongName} nicht gesichert werden")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
@@ -329,8 +342,36 @@ class Avorioni:
 				# todo Avorion hat diese Funktion noch nicht"
 			else:
 				raise KeyError
+		except NotImplemented:
+			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notRunning as e:
 			await ctx.send(f"{serverLongName} läuft nicht")
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")
+		except NoRights:
+			await ctx.send("DU darfst den Server nicht befehlen")
+		except KeyError:
+			await ctx.send("Bitte gib einen Server zum Sichern an.")
+			await ctx.send(f"```!status {self.allowedArguments}```")
+		except Exception as e:
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
+
+	async def update(self, ctx, *args):
+		# set a default for the excepts
+		serverLongName = "Server"
+		try:
+			if args:
+				# use local variables to make the code more readable
+				serverHandler = self.serverMap[args[0].lower()]["serverHandler"]
+				serverLongName = self.serverMap[args[0].lower()]['longName']
+
+				# send the status command and print it's return
+				await ctx.send(f"{serverHandler.update(userId=ctx.author.id)}")
+			else:
+				raise KeyError
+		except NotImplemented:
+			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
+		except Server_notStopping as e:
+			await ctx.send(f"{serverLongName} konnte nicht gestoppt werden")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")
 		except NoRights:
 			await ctx.send("DU darfst den Server nicht befehlen")
