@@ -61,7 +61,7 @@ async def log(strLoggingText):
 	if any(strElement in ("-l", "--logging") for strElement in sys.argv):
 		strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) + " - " + strLoggingText
 		print(strLoggingText)
-		# todo: what?
+		# print log info to a debug channel
 		# await settings.bot_debug.send(strLoggingText)
 
 
@@ -154,6 +154,16 @@ async def status(ctx, *args):
 @bot.command()
 async def update(ctx, *args):
 	await avorioniHandler.update(ctx, *args)
+
+
+@bot.command()
+async def add(ctx, *args):
+	await avorioniHandler.userAdd(ctx, *args)
+
+
+@bot.command()
+async def rm(ctx, *args):
+	await avorioniHandler.userRemove(ctx, *args)
 
 
 @is_admin()
@@ -339,7 +349,6 @@ class Avorioni:
 
 				# send the status command and print it's return
 				await ctx.send(f"{serverHandler.status(userId=ctx.author.id)}")
-				# todo Avorion hat diese Funktion noch nicht"
 			else:
 				raise KeyError
 		except NotImplemented:
@@ -378,6 +387,52 @@ class Avorioni:
 		except KeyError:
 			await ctx.send("Bitte gib einen Server zum Sichern an.")
 			await ctx.send(f"```!status {self.allowedArguments}```")
+		except Exception as e:
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
+
+	async def userAdd(self, ctx, *args):
+		# set a default for the excepts
+		serverLongName = "Server"
+		try:
+			if args:
+				# use local variables to make the code more readable
+				serverHandler = self.serverMap[args[0].lower()]["serverHandler"]
+				serverLongName = self.serverMap[args[0].lower()]['longName']
+
+				# send the status command and print it's return
+				await ctx.send(f"{serverHandler.userAdd(userId=ctx.author.id, newUser=ctx.message.mentions[0].id)}")
+			else:
+				raise KeyError
+		except NotImplemented:
+			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
+		except NoRights:
+			await ctx.send("DU darfst den Server nicht befehlen")
+		except KeyError:
+			await ctx.send("Bitte gib einen Server zum Sichern an.")
+			await ctx.send(f"```!add {self.allowedArguments} @USER```")
+		except Exception as e:
+			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
+
+	async def userRemove(self, ctx, *args):
+		# set a default for the excepts
+		serverLongName = "Server"
+		try:
+			if args:
+				# use local variables to make the code more readable
+				serverHandler = self.serverMap[args[0].lower()]["serverHandler"]
+				serverLongName = self.serverMap[args[0].lower()]['longName']
+
+				# send the status command and print it's return
+				await ctx.send(f"{serverHandler.userRemove(userId=ctx.author.id, newUser=ctx.message.mentions[0].id)}")
+			else:
+				raise KeyError
+		except NotImplemented:
+			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
+		except NoRights:
+			await ctx.send("DU darfst den Server nicht befehlen")
+		except KeyError:
+			await ctx.send("Bitte gib einen Server zum Sichern an.")
+			await ctx.send(f"```!add {self.allowedArguments} @USER```")
 		except Exception as e:
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
 
