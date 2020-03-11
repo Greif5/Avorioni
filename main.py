@@ -14,7 +14,7 @@ import sys
 #  global Variables
 listAdmins = []
 botId = ""
-jsonPath ="settings.json"
+jsonPath = "settings.json"
 LockFile = "Avorioni.lock"
 
 
@@ -56,9 +56,10 @@ def exit_Kontroll():
 		print("Lockfile konnte nicht entfernt werden" + str(e))
 
 
+# todo: use python logging
 async def log(strLoggingText):
 	if any(strElement in ("-l", "--logging") for strElement in sys.argv):
-		strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) +" - "+ strLoggingText
+		strLoggingText = strftime("%Y.%m.%d %H:%M:%S", localtime()) + " - " + strLoggingText
 		print(strLoggingText)
 		# todo: what?
 		# await settings.bot_debug.send(strLoggingText)
@@ -212,7 +213,6 @@ class Avorioni:
 				serverLongName = self.serverMap[args[0].lower()]['longName']
 
 				# send the backup command
-				# todo: not implemented in avorion
 				await ctx.send(f"{serverLongName} wird gesichert\nDies kann einige Sekunden dauern.")
 				serverHandler.backup(userId=ctx.author.id, intParam=1)
 				await ctx.send(f"{serverLongName} wurde gesichert")
@@ -248,7 +248,7 @@ class Avorioni:
 				# wait 420 seconds for the server to be started
 				for i in range(42):
 					# print and return successfully
-					if serverHandler.isStarted():
+					if serverHandler.isStarted(userId=ctx.author.id):
 						await ctx.send(f"{serverLongName} ist gestartet")
 						return
 					await asyncio.sleep(10)
