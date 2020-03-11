@@ -1,10 +1,8 @@
 import datetime
 import json
 import os
-import psutil
 import subprocess
 import tarfile
-import time
 import valve
 from exceptionClasses import *
 
@@ -83,6 +81,7 @@ class AvorionServer:
 		with open(f"{self.jsonPath}", "w") as f:
 			json.dump({self.jsonKey: saveDict}, f, indent=4)
 
+	# todo Implement
 	def backup(self, userId, intParam=1):
 		"""throws
 		Server_notStarting
@@ -96,7 +95,6 @@ class AvorionServer:
 		"""
 		if userId not in self.adminList:
 			raise NoRights
-		# todo Implement
 		raise NotImplemented
 		try:
 			# Stop the Server
@@ -122,6 +120,7 @@ class AvorionServer:
 		except Server_notStopping as e:
 			raise Server_notStopping(e)
 
+	# todo Implement
 	def runRcon(self, userId, strCommand):
 		"""throws
 		RCON_error
@@ -146,6 +145,7 @@ class AvorionServer:
 
 		return strReturn
 
+	# todo Implement
 	def stop(self, userId):
 		"""throws
 		Sever_notStopping
@@ -172,6 +172,7 @@ class AvorionServer:
 			except Exception as e:
 				raise Server_notStopping(e)
 
+	# todo Implement
 	def start(self, userId):
 		"""throws
 		Server_isRunning
@@ -198,6 +199,7 @@ class AvorionServer:
 		else:
 			raise Server_isRunning()
 
+	# todo Implement
 	def save(self, userId):
 		"""throws
 		RCON_error
@@ -222,6 +224,7 @@ class AvorionServer:
 		else:
 			raise Server_notRunning()
 
+	# todo Implement
 	def status(self, userId):
 		"""throws
 		NoRights
@@ -231,6 +234,7 @@ class AvorionServer:
 			raise NoRights
 		raise NotImplemented
 
+	# todo Implement
 	def update(self, userId):
 		"""throws
 		Server_notStarting
