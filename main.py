@@ -188,9 +188,9 @@ async def changename(ctx, *, name: str):
 class Avorioni:
 	def __init__(self):
 		self.serverMap = {
-			# "Avorion": {"serverHandler": ArkServer(), "longName": "ArkServer"},
-			"Ark": {"serverHandler": ArkServer(), "longName": "ArkServer"},
-			"Factorio": {"serverHandler": FactorioServer(), "longName": "FactorioServer"}
+			# "avorion": {"serverHandler": ArkServer(), "longName": "ArkServer"},
+			"ark": {"serverHandler": ArkServer(), "longName": "ArkServer"},
+			"factorio": {"serverHandler": FactorioServer(), "longName": "FactorioServer"}
 		}
 
 		# create a string of all allowed arguments
@@ -228,7 +228,7 @@ class Avorioni:
 				await ctx.send(f"{serverLongName} wurde gesichert")
 			else:
 				raise KeyError
-		except NotImplemented:
+		except NotImplementedError:
 			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notStopping as e:
 			await ctx.send(f"{serverLongName} konnte nicht gestoppt werden")
@@ -266,7 +266,7 @@ class Avorioni:
 				await ctx.send(f"Der {serverLongName} braucht unerwartet lange zum starten")
 			else:
 				raise KeyError
-		except NotImplemented:
+		except NotImplementedError:
 			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notStarting as e:
 			await ctx.send(f"{serverLongName} konnte nicht gestartet werden")
@@ -295,7 +295,7 @@ class Avorioni:
 				await ctx.send(f"{serverLongName} ist gestoppt")
 			else:
 				raise KeyError
-		except NotImplemented:
+		except NotImplementedError:
 			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notStopping as e:
 			await ctx.send(f"{serverLongName} konnte nicht gestoppt werden")
@@ -322,7 +322,7 @@ class Avorioni:
 				await ctx.send(f"{serverLongName} wurde gesichert")
 			else:
 				raise KeyError
-		except NotImplemented:
+		except NotImplementedError:
 			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notRunning as e:
 			await ctx.send(f"{serverLongName} nicht gesichert werden")
@@ -351,7 +351,7 @@ class Avorioni:
 				await ctx.send(f"{serverHandler.status(userId=ctx.author.id)}")
 			else:
 				raise KeyError
-		except NotImplemented:
+		except NotImplementedError:
 			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notRunning as e:
 			await ctx.send(f"{serverLongName} läuft nicht")
@@ -377,7 +377,7 @@ class Avorioni:
 				await ctx.send(f"{serverHandler.update(userId=ctx.author.id)}")
 			else:
 				raise KeyError
-		except NotImplemented:
+		except NotImplementedError:
 			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except Server_notStopping as e:
 			await ctx.send(f"{serverLongName} konnte nicht gestoppt werden")
@@ -400,15 +400,22 @@ class Avorioni:
 				serverLongName = self.serverMap[args[0].lower()]['longName']
 
 				# send the status command and print it's return
-				await ctx.send(f"{serverHandler.userAdd(userId=ctx.author.id, newUser=ctx.message.mentions[0].id)}")
+				for newUserId in args[1:]:
+					try:
+						newUserId = newUserId.split("!")[1][:-1]
+						serverHandler.userAdd(userId=ctx.author.id, newUser=newUserId)
+					except UserAlreadyAllowed:
+						await ctx.send(f"Ein Benutzer ist schon Priviligiert.")
+				await ctx.send(f"Es ist geschehen, Meister.")
 			else:
 				raise KeyError
-		except NotImplemented:
+		except NotImplementedError:
 			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except NoRights:
 			await ctx.send("DU darfst den Server nicht befehlen")
 		except KeyError:
-			await ctx.send("Bitte gib einen Server zum Sichern an.")
+			print(ctx.message)
+			await ctx.send("Bitte gib einen Server hinzufügen an.")
 			await ctx.send(f"```!add {self.allowedArguments} @USER```")
 		except Exception as e:
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
@@ -423,10 +430,16 @@ class Avorioni:
 				serverLongName = self.serverMap[args[0].lower()]['longName']
 
 				# send the status command and print it's return
-				await ctx.send(f"{serverHandler.userRemove(userId=ctx.author.id, newUser=ctx.message.mentions[0].id)}")
+				for newUserId in args[1:]:
+					try:
+						newUserId = newUserId.split("!")[1][:-1]
+						serverHandler.userRemove(userId=ctx.author.id, newUser=newUserId)
+					except UserNotAllowed:
+						await ctx.send(f"Ein Benutzer hatte noch gar keine Rechte.")
+				await ctx.send(f"Ihr Wunsch war mein Befehl, Meister.")
 			else:
 				raise KeyError
-		except NotImplemented:
+		except NotImplementedError:
 			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except NoRights:
 			await ctx.send("DU darfst den Server nicht befehlen")
@@ -436,7 +449,8 @@ class Avorioni:
 		except Exception as e:
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
 
-	async def kill(self, ctx):
+	@staticmethod
+	async def kill(ctx):
 		await ctx.send("Yes Master.")
 		await bot.close()
 

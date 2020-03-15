@@ -30,5 +30,9 @@ class NoRights(Exception):
 	pass
 
 
-class NotImplemented(Exception):
+class UserNotAllowed(Exception):
+	pass
+
+
+class UserAlreadyAllowed(Exception):
 	pass

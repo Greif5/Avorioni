@@ -64,22 +64,24 @@ class AvorionServer:
 									print(f"Error: key '{rconKey}' not found")  # todo: put in logs only
 
 	def saveJson(self):
+		oldJson = None
+		with open(self.jsonPath, "r") as file:
+			oldJson = json.load(file)
+
 		saveDict = {
 			"path": self.path,
 			"pathBackup": self.pathBackup,
 			"backupName": self.backupName,
 			"launcherName": self.launcherName,
 			"steamCMD": self.steamCMD,
-			"user": [],
-			"admin": [],
+			"user": self.priviligedUser,
+			"admin": self.adminList,
 			"rconSettings": self.rconSettings
 		}
-
-		for user in self.priviligedUser:
-			saveDict["user"].append(user)
+		oldJson[self.jsonKey] = saveDict
 
 		with open(f"{self.jsonPath}", "w") as f:
-			json.dump({self.jsonKey: saveDict}, f, indent=4)
+			json.dump(oldJson, f, indent=4)
 
 	# todo Implement
 	def backup(self, userId, intParam=1):
@@ -95,7 +97,7 @@ class AvorionServer:
 		"""
 		if userId not in self.adminList:
 			raise NoRights
-		raise NotImplemented
+		raise NotImplementedError
 		try:
 			# Stop the Server
 			self.stop(userId=userId)
@@ -133,7 +135,7 @@ class AvorionServer:
 		"""
 		if userId not in self.adminList:
 			raise NoRights
-		raise NotImplemented
+		raise NotImplementedError
 
 		try:
 			strReturn = valve.rcon.execute(
@@ -154,7 +156,7 @@ class AvorionServer:
 		"""
 		if userId not in self.adminList:
 			raise NoRights
-		raise NotImplemented
+		raise NotImplementedError
 
 		if self.cmdHandle:
 			try:
@@ -182,7 +184,7 @@ class AvorionServer:
 		"""
 		if userId not in self.adminList:
 			raise NoRights
-		raise NotImplemented
+		raise NotImplementedError
 
 		if not self.cmdHandle:
 			try:
@@ -209,7 +211,7 @@ class AvorionServer:
 		"""
 		if userId not in self.adminList:
 			raise NoRights
-		raise NotImplemented
+		raise NotImplementedError
 
 		if self.cmdHandle:
 			try:
@@ -232,7 +234,7 @@ class AvorionServer:
 		"""
 		if userId not in self.adminList:
 			raise NoRights
-		raise NotImplemented
+		raise NotImplementedError
 
 	# todo Implement
 	def update(self, userId):
@@ -245,7 +247,7 @@ class AvorionServer:
 		"""
 		if userId not in self.adminList:
 			raise NoRights
-		raise NotImplemented
+		raise NotImplementedError
 
 		try:
 			self.backup(0)
@@ -263,14 +265,16 @@ class AvorionServer:
 
 	def userAdd(self, userId, newUser):
 		if userId in self.adminList:
-			self.priviligedUser.append(newUser)
-			self.saveJson()
+			if newUser not in self.priviligedUser:
+				self.priviligedUser.append(str(newUser))
+				self.saveJson()
 		else:
 			raise NoRights
 
 	def userRemove(self, userId, newUser):
 		if userId in self.adminList:
-			self.priviligedUser.remove(newUser)
-			self.saveJson()
+			if newUser in self.priviligedUser:
+				self.priviligedUser.remove(str(newUser))
+				self.saveJson()
 		else:
 			raise NoRights

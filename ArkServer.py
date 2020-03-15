@@ -58,13 +58,9 @@ class ArkServer:
 			"pathBackup": self.pathBackup,
 			"backupName": self.backupName,
 			"launcherName": self.launcherName,
-			"user": [],
-			"admin": []
+			"user": self.priviligedUser,
+			"admin": self.adminList
 		}
-
-		for user in self.priviligedUser:
-			saveDict["user"].append(user)
-
 		oldJson[self.jsonKey] = saveDict
 
 		with open(f"{self.jsonPath}", "w") as f:
@@ -95,7 +91,7 @@ class ArkServer:
 
 			# Run backup
 			with tarfile.open(strBak, "w:gz") as tar:
-				tar.add(self.pathArk, arcname=os.path.basename(self.pathArk))
+				tar.add(self.path, arcname=os.path.basename(self.path))
 
 			if intParam:
 				try:
@@ -204,26 +200,24 @@ class ArkServer:
 		"""
 		if userId not in self.adminList:
 			raise NoRights
-		raise NotImplemented
+		raise NotImplementedError
 
 	def userAdd(self, userId, newUser):
 		if userId in self.adminList:
-			self.priviligedUser.append(newUser)
-			self.saveJson()
+			if newUser not in self.priviligedUser:
+				self.priviligedUser.append(str(newUser))
+				self.saveJson()
 		else:
 			raise NoRights
 
 	def userRemove(self, userId, newUser):
 		if userId in self.adminList:
-			self.priviligedUser.remove(newUser)
-			self.saveJson()
+			if newUser in self.priviligedUser:
+				self.priviligedUser.remove(str(newUser))
+				self.saveJson()
 		else:
 			raise NoRights
 
 
 # IDK-Funktion to remove weird ASCII-Escape chars
 noEscape = lambda s: "".join(i for i in s if not 27 == ord(i))
-
-if __name__ == '__main__':
-	foo = ArkServer()
-	foo.saveJson()
