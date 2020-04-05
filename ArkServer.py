@@ -77,7 +77,7 @@ class ArkServer:
 		Restart Server Y/n
 		
 		"""
-		if userId not in self.adminList:
+		if str(userId) not in self.adminList:
 			raise NoRights
 
 		try:
@@ -109,7 +109,7 @@ class ArkServer:
 		Server_notStopping
 		NoRights
 		"""
-		if userId not in self.priviligedUser:
+		if str(userId) not in self.priviligedUser:
 			raise NoRights
 		try:
 			if "the server is already stopped" in str(subprocess.run(self.launcherName + " stop", shell=True, check=True, stdout=subprocess.PIPE).stdout).lower():
@@ -123,7 +123,7 @@ class ArkServer:
 		Server_notStarting
 		NoRights
 		"""
-		if userId not in self.priviligedUser:
+		if str(userId) not in self.priviligedUser:
 			raise NoRights
 		try:
 			if "start aborted due to server already running" in str(
@@ -165,7 +165,7 @@ class ArkServer:
 		Server_notRunning
 		NoRights
 		"""
-		if userId not in self.priviligedUser:
+		if str(userId) not in self.priviligedUser:
 			raise NoRights
 		try:
 			if "unable to send cmd to a stopped server!" in str(
@@ -179,7 +179,7 @@ class ArkServer:
 		Server_notRunning
 		NoRights
 		"""
-		if userId not in self.priviligedUser:
+		if str(userId) not in self.priviligedUser:
 			raise NoRights
 		try:
 			strReturn = subprocess.run(self.launcherName + " status", shell=True, check=True, stdout=subprocess.PIPE).stdout.decode("UTF-8")
@@ -198,12 +198,12 @@ class ArkServer:
 		Server_notStopping
 		NoRights
 		"""
-		if userId not in self.adminList:
+		if str(userId) not in self.adminList:
 			raise NoRights
 		raise NotImplementedError
 
 	def userAdd(self, userId, newUser):
-		if userId in self.adminList:
+		if str(userId) in self.adminList:
 			if newUser not in self.priviligedUser:
 				self.priviligedUser.append(str(newUser))
 				self.saveJson()
@@ -211,7 +211,7 @@ class ArkServer:
 			raise NoRights
 
 	def userRemove(self, userId, newUser):
-		if userId in self.adminList:
+		if str(userId) in self.adminList:
 			if newUser in self.priviligedUser:
 				self.priviligedUser.remove(str(newUser))
 				self.saveJson()

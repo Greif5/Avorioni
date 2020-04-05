@@ -77,7 +77,8 @@ class FactorioServer:
 		"""Params
 		Restart Server Y/n
 		"""
-
+		if str(userId) not in self.adminList:
+			raise NoRights
 		try:
 			# Stop the Server
 			self.stop(userId=userId)
@@ -122,7 +123,7 @@ class FactorioServer:
 		Server_notStopping
 		NoRights
 		"""
-		if userId not in self.priviligedUser:
+		if str(userId) not in self.priviligedUser:
 			raise NoRights
 		try:
 			if "Factorio is not running." in str(
@@ -140,7 +141,7 @@ class FactorioServer:
 		Server_notStarting
 		NoRights
 		"""
-		if userId not in self.priviligedUser:
+		if str(userId) not in self.priviligedUser:
 			raise NoRights
 		try:
 			if "server already running." in str(
@@ -158,7 +159,7 @@ class FactorioServer:
 		Server_notRunning
 		NoRights
 		"""
-		if userId not in self.priviligedUser:
+		if str(userId) not in self.priviligedUser:
 			raise NoRights
 		try:
 			if "unable to send cmd to a stopped server!" in str(
@@ -176,7 +177,7 @@ class FactorioServer:
 		Server_notRunning
 		NoRights
 		"""
-		if userId not in self.priviligedUser:
+		if str(userId) not in self.priviligedUser:
 			raise NoRights
 		try:
 			strReturn_Status = subprocess.run(
@@ -209,12 +210,12 @@ class FactorioServer:
 		Server_notStopping
 		NoRights
 		"""
-		if userId not in self.adminList:
+		if str(userId) not in self.adminList:
 			raise NoRights
 		raise NotImplementedError
 
 	def userAdd(self, userId, newUser):
-		if userId in self.adminList:
+		if str(userId) in self.adminList:
 			if newUser not in self.priviligedUser:
 				self.priviligedUser.append(str(newUser))
 				self.saveJson()
@@ -222,7 +223,7 @@ class FactorioServer:
 			raise NoRights
 
 	def userRemove(self, userId, newUser):
-		if userId in self.adminList:
+		if str(userId) in self.adminList:
 			if newUser in self.priviligedUser:
 				self.priviligedUser.remove(str(newUser))
 				self.saveJson()

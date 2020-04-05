@@ -17,7 +17,6 @@ botId = ""
 jsonPath = "settings.json"
 LockFile = "Avorioni.lock"
 
-
 # Parameter:
 # -c	--clear
 # deletes Lockfile, if it exits.
@@ -68,11 +67,8 @@ async def log(strLoggingText):
 def jsonSave():
 	saveDict = {
 		"botId": botId,
-		"admin": []
+		"admin": listAdmins
 	}
-
-	for admin in listAdmins:
-		saveDict["admin"].append(admin)
 
 	with open(f"{jsonPath}", "w") as f:
 		json.dump(saveDict, f, indent=4)
@@ -124,6 +120,20 @@ def is_admin():
 @bot.event
 async def on_ready():
 	await avorioniHandler.on_ready()
+
+
+@bot.event
+async def on_command_error(ctx, error):
+	if isinstance(error, commands.CommandNotFound):
+		message = ""
+		if str(ctx.message.author.id) in listAdmins:
+			message += "Verzeihung Meister, ich verstehe nicht."
+		else:
+			message += f"Entschulidige {ctx.message.author.name}, bitte halte dich an den vorgegebenen Befehlssatz:\n"
+			message += await avorioniHandler.printInstructionSet()
+		await ctx.send(message)
+		return
+	raise error
 
 
 @bot.command()
@@ -274,7 +284,10 @@ class Avorioni:
 		except Server_isRunning:
 			await ctx.send(f"{serverLongName} läuft bereits")
 		except NoRights:
-			await ctx.send("DU darfst den Server nicht befehlen")
+			if str(ctx.author.id) in listAdmins:
+				await ctx.send("Verzeihung Meister, ich habe einen Bug.")
+			else:
+				await ctx.send("DU darfst den Server nicht befehlen")
 		except KeyError:
 			await ctx.send("Bitte gib einen Server zum Starten an.")
 			await ctx.send(f"```!start {self.allowedArguments}```")
@@ -301,7 +314,10 @@ class Avorioni:
 			await ctx.send(f"{serverLongName} konnte nicht gestoppt werden")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
 		except NoRights:
-			await ctx.send("DU darfst den Server nicht befehlen")
+			if str(ctx.author.id) in listAdmins:
+				await ctx.send("Verzeihung Meister, ich habe einen Bug.")
+			else:
+				await ctx.send("DU darfst den Server nicht befehlen")
 		except KeyError:
 			await ctx.send("Bitte gib einen Server zum Stoppen an.")
 			await ctx.send(f"```!stop {self.allowedArguments}```")
@@ -331,7 +347,10 @@ class Avorioni:
 			await ctx.send("Es gab einen Fehler!")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")  # todo put in logs only
 		except NoRights:
-			await ctx.send("DU darfst den Server nicht befehlen")
+			if str(ctx.author.id) in listAdmins:
+				await ctx.send("Verzeihung Meister, ich habe einen Bug.")
+			else:
+				await ctx.send("DU darfst den Server nicht befehlen")
 		except KeyError:
 			await ctx.send("Bitte gib einen Server zum Sichern an.")
 			await ctx.send(f"```!save {self.allowedArguments}```")
@@ -357,7 +376,10 @@ class Avorioni:
 			await ctx.send(f"{serverLongName} läuft nicht")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")
 		except NoRights:
-			await ctx.send("DU darfst den Server nicht befehlen")
+			if str(ctx.author.id) in listAdmins:
+				await ctx.send("Verzeihung Meister, ich habe einen Bug.")
+			else:
+				await ctx.send("DU darfst den Server nicht befehlen")
 		except KeyError:
 			await ctx.send("Bitte gib einen Server zum Sichern an.")
 			await ctx.send(f"```!status {self.allowedArguments}```")
@@ -383,7 +405,10 @@ class Avorioni:
 			await ctx.send(f"{serverLongName} konnte nicht gestoppt werden")
 			await ctx.send("Der Fehler lautet:```" + str(e) + "```")
 		except NoRights:
-			await ctx.send("DU darfst den Server nicht befehlen")
+			if str(ctx.author.id) in listAdmins:
+				await ctx.send("Verzeihung Meister, ich habe einen Bug.")
+			else:
+				await ctx.send("DU darfst den Server nicht befehlen")
 		except KeyError:
 			await ctx.send("Bitte gib einen Server zum Sichern an.")
 			await ctx.send(f"```!status {self.allowedArguments}```")
@@ -412,7 +437,10 @@ class Avorioni:
 		except NotImplementedError:
 			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except NoRights:
-			await ctx.send("DU darfst den Server nicht befehlen")
+			if str(ctx.author.id) in listAdmins:
+				await ctx.send("Verzeihung Meister, ich habe einen Bug.")
+			else:
+				await ctx.send("DU darfst den Server nicht befehlen")
 		except KeyError:
 			print(ctx.message)
 			await ctx.send("Bitte gib einen Server hinzufügen an.")
@@ -442,7 +470,10 @@ class Avorioni:
 		except NotImplementedError:
 			await ctx.send(f"{serverLongName} unterstützt diesen Befehl noch nicht!")
 		except NoRights:
-			await ctx.send("DU darfst den Server nicht befehlen")
+			if str(ctx.author.id) in listAdmins:
+				await ctx.send("Verzeihung Meister, ich habe einen Bug.")
+			else:
+				await ctx.send("DU darfst den Server nicht befehlen")
 		except KeyError:
 			await ctx.send("Bitte gib einen Server zum Sichern an.")
 			await ctx.send(f"```!add {self.allowedArguments} @USER```")
@@ -453,8 +484,28 @@ class Avorioni:
 	async def kill(ctx):
 		await ctx.send("Yes Master.")
 		await bot.close()
+		sys.exit()
+
+	async def printInstructionSet(self):
+		strReturn = "```\n"
+		strReturn += f"!start {self.allowedArguments}\n"
+		strReturn += f"!stop {self.allowedArguments}\n"
+		strReturn += f"!status {self.allowedArguments}\n"
+		strReturn += f"!save {self.allowedArguments}\n"
+		strReturn += f"\n"
+		strReturn += f"!backup {self.allowedArguments}\n"
+		strReturn += f"!update {self.allowedArguments}\n"
+		strReturn += f"!add {self.allowedArguments} @USER\n"
+		strReturn += f"!rm {self.allowedArguments} @USER\n"
+		strReturn += f"```"
+
+		return strReturn
 
 
 if __name__ == '__main__':
 	avorioniHandler = Avorioni()
-	bot.run(botId)
+	while True:
+		try:
+			bot.run(botId)
+		except KeyError:
+			pass
